@@ -1,6 +1,6 @@
 from sklearn.linear_model import LinearRegression
 import pandas as pd
-from temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.__init__ import weather_station_coords
 import pickle
 
 def load_engineered_data():

@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from temperature_forecaster.__init__ import weather_station_coords
-from temperature_forecaster.load_weather_data import optimal_k_vals
+from src.temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.load_weather_data import optimal_k_vals
 
 def load_data():
     loaded_data = []

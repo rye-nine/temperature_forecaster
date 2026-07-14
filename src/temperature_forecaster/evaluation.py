@@ -3,9 +3,9 @@
 # the actual observed frequencies of those temperature ranges
 # spanning the historical data.
 
-from temperature_forecaster.forecasting import run_forecasting
-from temperature_forecaster.fourier_features import load_data
-from temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.forecasting import run_forecasting
+from src.temperature_forecaster.fourier_features import load_data
+from src.temperature_forecaster.__init__ import weather_station_coords
 # get_final_residuals is a function that returns a list of 
 # dataframes that has all of the features and the final predictions
 # and residuals

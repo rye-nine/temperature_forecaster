@@ -1,7 +1,7 @@
 from sklearn.linear_model import LinearRegression
-from temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.__init__ import weather_station_coords
 import pickle
-from temperature_forecaster.fourier_training import load_engineered_data
+from src.temperature_forecaster.fourier_training import load_engineered_data
 
 def load_models(variable="tmax"):
     model_list = []

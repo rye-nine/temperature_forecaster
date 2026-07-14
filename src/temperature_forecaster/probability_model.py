@@ -1,6 +1,6 @@
-from temperature_forecaster.residual_autocorrelation import load_models, get_lagged_df
-from temperature_forecaster.__init__ import weather_station_coords
-from temperature_forecaster.load_weather_data import optimal_k_vals
+from src.temperature_forecaster.residual_autocorrelation import load_models, get_lagged_df
+from src.temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.load_weather_data import optimal_k_vals
 import pickle
 import numpy as np
 

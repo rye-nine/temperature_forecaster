@@ -1,4 +1,4 @@
-from temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.__init__ import weather_station_coords
 from datetime import datetime
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error

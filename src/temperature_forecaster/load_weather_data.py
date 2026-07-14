@@ -37,8 +37,8 @@ Notes:
 
 from datetime import date
 import meteostat as ms # type: ignore
-from temperature_forecaster.__init__ import weather_station_coords
-from temperature_forecaster.find_optimize_fourier_terms import optimize_fourier_terms
+from src.temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.find_optimize_fourier_terms import optimize_fourier_terms
 
 
 optimal_k_vals =  optimize_fourier_terms(max_k=10, variable="tmax")

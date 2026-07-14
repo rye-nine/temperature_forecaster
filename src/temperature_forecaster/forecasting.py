@@ -1,5 +1,5 @@
-from temperature_forecaster.probability_model import normal_distribution_approximation
-from temperature_forecaster.__init__ import weather_station_coords
+from src.temperature_forecaster.probability_model import normal_distribution_approximation
+from src.temperature_forecaster.__init__ import weather_station_coords
 from scipy.stats import norm
 
 def get_probability(day, prev_temps, city, minimum, maximum, variable="tmax"):
