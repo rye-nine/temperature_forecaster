@@ -5,13 +5,21 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 import matplotlib.pyplot as plt
+import os
+from pathlib import Path
+import io 
+import base64
+import pickle
 
-from src.temperature_forecaster.probability_model import get_final_residuals
-from src.temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.probability_model import get_final_residuals
+from temperature_forecaster.__init__ import weather_station_coords
 
 def get_ts(city, df_list, variable = "tmax"):
     city_index = (list(weather_station_coords.keys())).index(city)
     city_df = df_list[city_index]
+
+    set_width = 1500
+    set_height = 800
     
     if (variable == "tmin"):
         raise NotImplementedError
@@ -20,14 +28,16 @@ def get_ts(city, df_list, variable = "tmax"):
         x = "time",
         y = variable 
             ).properties(
-                    width = 1200
+                    width = set_width,
+                    height = set_height
                     )
     # estimation
     c2 = alt.Chart(city_df).mark_line(color="red").encode(
             x = "time",
             y = "final_prediction:Q" # tmin predictions not up yet
             ).properties(
-                    width = 1200
+                    width = set_width,
+                    height = set_height
                     )
 
     # residuals
@@ -35,10 +45,11 @@ def get_ts(city, df_list, variable = "tmax"):
             x = "time",
             y = "final_residuals:Q"
             ).properties(
-                    width = 1200
+                    width = set_width,
+                    height = set_height
                     )
     return_df = c1+c2+c3
-    return return_df
+    return c1+c2+c3
 
 def get_histogram(city, df_list, variable = "tmax"):
     city_index = (list(weather_station_coords.keys())).index(city)
@@ -62,13 +73,16 @@ def get_Q_Q_plot(city, df_list, variable = "tmax"):
 
     fig, ax = plt.subplots()
 
-    stats.probplot(city_df["residual"], dist="norm", plot=ax)
+    stats.probplot(city_df["final_residuals"], dist="norm", plot=ax)
 
     return fig
 
 def get_charts(city = None, variable = "tmax"):
 
-    list_df = get_final_residuals("tmax")
+    list_of_df = get_final_residuals("tmax")
+
+    list_df = [dataf.reset_index() for dataf in list_of_df] 
+    print(list_df[2].columns)
 
     if (city is None):
         city_names = list(weather_station_coords.keys())
@@ -81,4 +95,46 @@ def get_charts(city = None, variable = "tmax"):
     histogram = get_histogram(city, list_df, variable)
     QQ_plot = get_Q_Q_plot(city, list_df, variable)
 
-    return ts_charts, histogram, QQ_plot
+    buffer = io.BytesIO()
+    QQ_plot.savefig(buffer, format="png", bbox_inches="tight")
+    buffer.seek(0)
+    qqplot_base64 = base64.b64encode(buffer.read()).decode("utf-8")
+
+    combined = ts_charts | histogram
+    combined_html = combined.to_html()
+    #ts_html = ts_charts.to_html()
+    #hist_html = histogram.to_html()
+
+    html = f"""
+    <html>
+
+    <body>
+
+    <h1>Miami Forecast Diagnostics</h1>
+
+    {combined_html}
+
+    <hr>
+
+    <h2>QQ Plot</h2>
+
+    <img src="data:image/png;base64,{qqplot_base64}">
+
+    </body>
+
+    </html>
+    """
+
+    #ts_charts.save(f"charts/{city}_.html")
+    #os.startfile(f"{city}.html")  # Windows only
+    print("done")
+
+    output = Path("charts") / f"{city}.html"
+    with open(f"charts/{city}.html", "w", encoding="utf-8") as f:
+        f.write(html)
+
+    os.startfile(output) # Windows only
+    return html
+
+def testing():
+    print("bruh")

@@ -1,12 +1,13 @@
 from sklearn.linear_model import LinearRegression
-from src.temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.__init__ import weather_station_coords
 import pickle
-from src.temperature_forecaster.fourier_training import load_engineered_data
+from temperature_forecaster.fourier_training import load_engineered_data
+from temperature_forecaster.paths import FOURIER_MODELS, AUTOREGRESSION_MODELS
 
 def load_models(variable="tmax"):
     model_list = []
     for location in weather_station_coords.keys():
-        with open(f"../models/fourier_models/{location}_{variable}_fourier_model.pkl", "rb") as f:
+        with open(FOURIER_MODELS / f"{location}_{variable}_fourier_model.pkl", "rb") as f:
             model = pickle.load(f)
             model_list.append(model)
     return model_list
@@ -50,7 +51,7 @@ def train_residual_models(variable="tmax", lag=3):
 
 def store(models, variable, lag=3):
     for model, cityName in zip(models, weather_station_coords.keys()):
-        target = f"../models/residual_autoregression_models/AR({lag})_{cityName}_{variable}.pkl"
+        target = AUTOREGRESSION_MODELS / f"AR({lag})_{cityName}_{variable}.pkl"
         with open(target, "wb") as f:
             pickle.dump(model, f)
 

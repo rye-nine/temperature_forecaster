@@ -1,13 +1,14 @@
-from src.temperature_forecaster.residual_autocorrelation import load_models, get_lagged_df
-from src.temperature_forecaster.__init__ import weather_station_coords
-from src.temperature_forecaster.load_weather_data import optimal_k_vals
+from temperature_forecaster.residual_autocorrelation import load_models, get_lagged_df
+from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.load_weather_data import optimal_k_vals
+from temperature_forecaster.paths import AUTOREGRESSION_MODELS
 import pickle
 import numpy as np
 
 def load_residual_models(variable="tmax", lag=3):
     model_list = []
     for location in weather_station_coords.keys():
-        with open(f"../models/residual_autoregression_models/AR({lag})_{location}_{variable}.pkl", "rb") as f:
+        with open(AUTOREGRESSION_MODELS / f"AR({lag})_{location}_{variable}.pkl", "rb") as f:
             model_list.append(pickle.load(f))
     return model_list
 

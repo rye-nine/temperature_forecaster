@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 
-from src.temperature_forecaster.__init__ import weather_station_coords
-from src.temperature_forecaster.load_weather_data import optimal_k_vals
+from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.load_weather_data import optimal_k_vals
+from temperature_forecaster.paths import DATA_RAW, DATA_PROCESSED
 
 def load_data():
     loaded_data = []
     for location in weather_station_coords.keys():
-        df = pd.read_csv(f"../data/raw/{location}_weather_data.csv", index_col=0, parse_dates=True)
+        df = pd.read_csv(DATA_RAW/f"{location}_weather_data.csv", index_col=0, parse_dates=True)
         df["day_of_year"] = df.index.dayofyear
         loaded_data.append(df)
     return loaded_data
@@ -32,7 +33,7 @@ def create_fourier_features():
 def store_data(data):
     for df, cityName in zip(data, weather_station_coords.keys()):
         print(f"Storing engineered data for {cityName}...")
-        df.to_csv(f"../data/processed/{cityName}_weather_data.csv")
+        df.to_csv(DATA_PROCESSED / f"{cityName}_weather_data.csv")
 
 def engineer_and_store_data():
     engineered_df_list = create_fourier_features()

@@ -1,12 +1,13 @@
 from sklearn.linear_model import LinearRegression
 import pandas as pd
-from src.temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.paths import DATA_PROCESSED, FOURIER_MODELS
 import pickle
 
 def load_engineered_data():
     engineered_df_list = []
     for location in weather_station_coords.keys():
-        df = pd.read_csv(f"../data/processed/{location}_weather_data.csv", index_col=0, parse_dates=True)
+        df = pd.read_csv(DATA_PROCESSED / f"{location}_weather_data.csv", index_col=0, parse_dates=True)
         engineered_df_list.append(df)
     return engineered_df_list
 
@@ -23,7 +24,7 @@ def train(variable="tmax"): #tmax or tmin
 
 def store(models, variable="tmax"):
     for model, cityName in zip(models, weather_station_coords.keys()):
-        with open(f"../models/fourier_models/{cityName}_{variable}_fourier_model.pkl", "wb") as f:
+        with open(FOURIER_MODELS / f"{cityName}_{variable}_fourier_model.pkl", "wb") as f:
             pickle.dump(model, f) 
     
 def train_and_store_models(variable="tmax"):

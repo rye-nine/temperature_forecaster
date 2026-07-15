@@ -1,18 +1,21 @@
-from src.temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.__init__ import weather_station_coords
 from datetime import datetime
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 import altair as alt # type: ignore
 import pandas as pd
 import numpy as np
+from temperature_forecaster.paths import DATA_RAW
 
 # after completing, make it so that load_weather_data takes
 # optimal k-values from THIS script
 
+# ok i think you just need processed_data?
+
 def temp_load_data():
     loaded_data = []
     for location in weather_station_coords.keys():
-        df = pd.read_csv(f"../data/raw/{location}_weather_data.csv", index_col=0, parse_dates=True)
+        df = pd.read_csv(DATA_RAW / f"{location}_weather_data.csv", index_col=0, parse_dates=True)
         df["day_of_year"] = df.index.dayofyear
         loaded_data.append(df)
     return loaded_data

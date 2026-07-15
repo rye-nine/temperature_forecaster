@@ -1,3 +1,4 @@
-from src.temperature_forecaster.exploration import get_charts
+from temperature_forecaster.exploration import get_charts
+import os
 
-get_charts()
+report = get_charts("Miami", "tmax")
