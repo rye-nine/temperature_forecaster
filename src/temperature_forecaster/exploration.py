@@ -77,19 +77,23 @@ def get_Q_Q_plot(city, df_list, variable = "tmax"):
 
     return fig
 
-def get_charts(city = None, variable = "tmax"):
+def get_charts(city = None, variable = "tmax"): # used to get individual charts
 
     list_of_df = get_final_residuals("tmax")
 
     list_df = [dataf.reset_index() for dataf in list_of_df] 
-    print(list_df[2].columns)
 
     if (city is None):
         city_names = list(weather_station_coords.keys())
-        return_list = [[get_ts(nameCity, list_df, variable),
+        lst = [[get_ts(nameCity, list_df, variable),
                         get_histogram(nameCity, list_df, variable),
                         get_Q_Q_plot(nameCity, list_df, variable)] for nameCity in city_names]
-        return return_list
+        
+        return_dict = {
+            cityName : cityCharts
+            for cityName, cityCharts in zip(city_names, lst)
+                }
+        return return_dict
 
     ts_charts = get_ts(city, list_df, variable)
     histogram = get_histogram(city, list_df, variable)
@@ -100,7 +104,7 @@ def get_charts(city = None, variable = "tmax"):
     buffer.seek(0)
     qqplot_base64 = base64.b64encode(buffer.read()).decode("utf-8")
 
-    combined = ts_charts | histogram
+    combined = ts_charts & histogram
     combined_html = combined.to_html()
     #ts_html = ts_charts.to_html()
     #hist_html = histogram.to_html()
@@ -110,7 +114,7 @@ def get_charts(city = None, variable = "tmax"):
 
     <body>
 
-    <h1>Miami Forecast Diagnostics</h1>
+    <h1>{city} Forecast Diagnostics</h1>
 
     {combined_html}
 
@@ -127,14 +131,18 @@ def get_charts(city = None, variable = "tmax"):
 
     #ts_charts.save(f"charts/{city}_.html")
     #os.startfile(f"{city}.html")  # Windows only
-    print("done")
+    print(f"Created charts for {city}")
 
-    output = Path("charts") / f"{city}.html"
     with open(f"charts/{city}.html", "w", encoding="utf-8") as f:
         f.write(html)
 
-    os.startfile(output) # Windows only
     return html
 
-def testing():
-    print("bruh")
+def populate_charts(variable = "tmax", open_charts = False): # used for populating the charts/ folder
+    city_names = list(weather_station_coords.keys())
+    for city in city_names:
+        get_charts(city, variable)
+        if (open_charts):
+            output = Path("charts") / f"{city}.html"
+            os.startfile(output) # Windows only
+    print("Open a chart by running the following command in root folder: start charts/[city_name].html")
