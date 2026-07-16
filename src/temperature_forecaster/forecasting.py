@@ -1,5 +1,6 @@
 from temperature_forecaster.probability_model import normal_distribution_approximation
 from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.probability_model import get_final_residuals
 from scipy.stats import norm
 
 def get_probability(day, prev_temps, city, minimum, maximum, variable="tmax"):
@@ -17,6 +18,27 @@ def get_probability(day, prev_temps, city, minimum, maximum, variable="tmax"):
         prob = norm.cdf(j + 1, loc=mu, scale=sigma) - norm.cdf(j, loc=mu, scale=sigma)
         probabilities.append(((j, j+1),prob))
     return probabilities
+
+# testing
+def get_empirical_probability(day, prev_temps, city, minimum, maximum, variable = "tmax"):
+    df_with_residuals_list = get_final_residuals(variable)
+    city_index = list(weather_station_coords.keys()).index(city)
+    our_df = df_with_residuals_list[city_index]
+    # now we have our desired df based on city
+    # now let's get the appropriate residuals
+    day_offset = 15
+    bool1 = our_df["day_of_year"] >= day - day_offset
+    bool2 = our_df["day_of_year"] <= day + day_offset
+    good_df = our_df[bool1 & bool2]
+    desired_residuals = list(good_df["final_residuals"])
+
+    # just for getting the approximated extrema
+    all_distributions = normal_distribution_approximation(prev_temps, day, variable)
+    city_distribution = all_distributions[city]
+    approximation = city_distribution[0]
+    
+    observed = (desired_residuals >= minimum-approximation) & (desired_residuals < maximum-approximation)
+    return observed.sum() / len(desired_residuals)
 
 def run_forecasting(day, prev_temps, minimum, maximum, city=None, variable="tmax"):
     city_names = list(weather_station_coords.keys())
