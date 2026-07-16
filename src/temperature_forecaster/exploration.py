@@ -21,8 +21,6 @@ def get_ts(city, df_list, variable = "tmax"):
     set_width = 1500
     set_height = 800
     
-    if (variable == "tmin"):
-        raise NotImplementedError
     #actual
     c1 = alt.Chart(city_df).mark_line().encode(
         x = "time",
@@ -55,9 +53,6 @@ def get_histogram(city, df_list, variable = "tmax"):
     city_index = (list(weather_station_coords.keys())).index(city)
     city_df = df_list[city_index]
 
-    if (variable == "tmin"):
-        raise NotImplementedError
-
     histogram = alt.Chart(city_df).mark_bar().encode(
         alt.X("final_residuals:Q", bin=alt.Bin(maxbins=50), title="Residual (°F)"),
         alt.Y("count()", title="Frequency")
@@ -68,20 +63,18 @@ def get_Q_Q_plot(city, df_list, variable = "tmax"):
     city_index = (list(weather_station_coords.keys())).index(city)
     city_df = df_list[city_index]
 
-    if (variable == "tmin"):
-        raise NotImplementedError
-
     fig, ax = plt.subplots()
 
     stats.probplot(city_df["final_residuals"], dist="norm", plot=ax)
 
     return fig
 
-def get_charts(city = None, variable = "tmax"): # used to get individual charts
+def get_charts(city = None, variable = "tmax"):
 
-    list_of_df = get_final_residuals("tmax")
+    list_of_df = get_final_residuals(variable)
 
     list_df = [dataf.reset_index() for dataf in list_of_df] 
+    print(list_df[2].columns)
 
     if (city is None):
         city_names = list(weather_station_coords.keys())
@@ -114,7 +107,7 @@ def get_charts(city = None, variable = "tmax"): # used to get individual charts
 
     <body>
 
-    <h1>{city} Forecast Diagnostics</h1>
+    <h1>{city}_{variable} Forecast Diagnostics</h1>
 
     {combined_html}
 
@@ -133,7 +126,7 @@ def get_charts(city = None, variable = "tmax"): # used to get individual charts
     #os.startfile(f"{city}.html")  # Windows only
     print(f"Created charts for {city}")
 
-    with open(f"charts/{city}.html", "w", encoding="utf-8") as f:
+    with open(f"charts/{city}_{variable}.html", "w", encoding="utf-8") as f:
         f.write(html)
 
     return html
@@ -143,6 +136,6 @@ def populate_charts(variable = "tmax", open_charts = False): # used for populati
     for city in city_names:
         get_charts(city, variable)
         if (open_charts):
-            output = Path("charts") / f"{city}.html"
+            output = Path("charts") / f"{city}_{variable}.html"
             os.startfile(output) # Windows only
     print("Open a chart by running the following command in root folder: start charts/[city_name].html")

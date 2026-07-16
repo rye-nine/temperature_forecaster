@@ -13,7 +13,7 @@ def load_models(variable="tmax"):
     return model_list
 
 def get_residual_list(variable="tmax"):
-    engineered_df_list = load_engineered_data()
+    engineered_df_list = load_engineered_data(variable)
     model_list = load_models(variable)
     df_residuals_list = []
     for df, model in zip(engineered_df_list, model_list):

@@ -1,6 +1,6 @@
 from temperature_forecaster.residual_autocorrelation import load_models, get_lagged_df
 from temperature_forecaster.__init__ import weather_station_coords
-from temperature_forecaster.load_weather_data import optimal_k_vals
+from temperature_forecaster.load_weather_data import optimal_k_vals, tmin_optimal_k_vals
 from temperature_forecaster.paths import AUTOREGRESSION_MODELS
 import pickle
 import numpy as np
@@ -23,7 +23,7 @@ def day_transform(day,k):
 def residual_transform(prev_temps,day, city, variable="tmax"):
     index = list(weather_station_coords.keys()).index(city)
     fourier_model = load_models(variable)[index]
-    k_val = optimal_k_vals[city]
+    k_val = optimal_k_vals[city] if (variable == "tmax") else tmin_optimal_k_vals[city]
     residual_list = []
     for i in range(1, len(prev_temps) + 1):
         target_day = day - i
@@ -43,8 +43,9 @@ def extrema_approximation_all(prev_temps, day, variable="tmax"):
         index = list(weather_station_coords.keys()).index(city)
         city_fourier_model = fourier_model[index]
         city_residual_model = residual_model[index]
-
-        transformed_day = day_transform(day, optimal_k_vals[city])
+        
+        our_k_vals = optimal_k_vals if (variable == "tmax") else tmin_optimal_k_vals
+        transformed_day = day_transform(day, our_k_vals[city])
         approximation = city_fourier_model.predict([transformed_day])[0] +city_residual_model.predict([residual_transform(prev_temps, day, city, variable)])[0]
         approximation_list.append(approximation)
 

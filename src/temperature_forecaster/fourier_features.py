@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 
 from temperature_forecaster.__init__ import weather_station_coords
-from temperature_forecaster.load_weather_data import optimal_k_vals
+from temperature_forecaster.load_weather_data import optimal_k_vals, tmin_optimal_k_vals
 from temperature_forecaster.paths import DATA_RAW, DATA_PROCESSED
 
-def load_data():
+def load_data(): # loads RAW data 
     loaded_data = []
     for location in weather_station_coords.keys():
         df = pd.read_csv(DATA_RAW/f"{location}_weather_data.csv", index_col=0, parse_dates=True)
@@ -13,29 +13,32 @@ def load_data():
         loaded_data.append(df)
     return loaded_data
 
-def create_fourier_features():
+def create_fourier_features(variable = "tmax"):
     data = load_data()
-    print(f"Number of locations: {len(data)}")
     engineered_df_list = []
+    k_list = None
+    if variable == "tmax":
+        k_list = optimal_k_vals # for tmax
+    else: # if variable == tmin
+        k_list = tmin_optimal_k_vals
     for df, cityName in zip(data, weather_station_coords.keys()):
         engineered_df = df.copy()
         
         engineered_df = engineered_df[["tmax", "tmin"]]
         engineered_df["day_of_year"] = engineered_df.index.dayofyear
 
-        optimal_k = int(optimal_k_vals[cityName])
+        optimal_k = int(k_list[cityName])
         for j in range(1, optimal_k+1):
             engineered_df[f"Fsin{j}"] = np.sin(j*2*np.pi*engineered_df["day_of_year"]/365)
             engineered_df[f"Fcos{j}"] = np.cos(j*2*np.pi*engineered_df["day_of_year"]/365)
         engineered_df_list.append(engineered_df)
     return engineered_df_list
     
-def store_data(data):
+def store_data(data, variable = "tmax"):
     for df, cityName in zip(data, weather_station_coords.keys()):
-        print(f"Storing engineered data for {cityName}...")
-        df.to_csv(DATA_PROCESSED / f"{cityName}_weather_data.csv")
+        print(f"Storing {variable} engineered data for {cityName}...")
+        df.to_csv(DATA_PROCESSED / f"{cityName}_{variable}_weather_data.csv")
 
-def engineer_and_store_data():
+def engineer_and_store_data(variable = "tmax"):
     engineered_df_list = create_fourier_features()
-    print(len(engineered_df_list))
-    store_data(engineered_df_list)
+    store_data(engineered_df_list, variable)
