@@ -36,18 +36,30 @@ def get_empirical_probability(day, prev_temps, city, minimum, maximum, variable 
     all_distributions = normal_distribution_approximation(prev_temps, day, variable)
     city_distribution = all_distributions[city]
     approximation = city_distribution[0]
-    
-    observed = (desired_residuals >= minimum-approximation) & (desired_residuals < maximum-approximation)
-    return observed.sum() / len(desired_residuals)
 
-def run_forecasting(day, prev_temps, minimum, maximum, city=None, variable="tmax"):
+    probabilities = []
+    for i in range(minimum, maximum):
+        observed = (desired_residuals >= i-approximation) & (desired_residuals < i+1-approximation)
+        prob = observed.sum() / len(desired_residuals)
+        probabilities.append(((i,i+1), prob))
+    return probabilities
+
+#mode = 1 --> normal distribution
+#mode = 2 --> empirical residual distribution
+def run_forecasting(mode,day, prev_temps, minimum, maximum, city=None, variable="tmax"):
     city_names = list(weather_station_coords.keys())
     if (city is None): # no city is specified
         dict = {}
         for city in city_names:
-            dict[city] = get_probability(day, prev_temps, city, minimum, maximum, variable)
+            if mode == 1:
+                dict[city] = get_probability(day, prev_temps, city, minimum, maximum, variable)
+            else:
+                dict[city] = get_empirical_probability(day, prev_temps, city, minimum, maximum, variable)
         #print(dict)
         return dict
-    probabs = get_probability(day, prev_temps, city, minimum, maximum, variable)
+    if mode == 1:
+        probabs = get_probability(day, prev_temps, city, minimum, maximum, variable)
+    else:
+        probabs = get_empirical_probability(day,prev_temps, city, minimum, maximum, variable)
     #print(f"Probabilities for {city}: {probabs}")
     return probabs
