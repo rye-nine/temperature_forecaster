@@ -11,16 +11,14 @@ def load_data(): # loads RAW data
         df = pd.read_csv(DATA_RAW/f"{location}_weather_data.csv", index_col=0, parse_dates=True)
         df["day_of_year"] = df.index.dayofyear
         loaded_data.append(df)
+        print(f"Loaded from data/raw: {location}_weather_data.csv") 
     return loaded_data
 
 def create_fourier_features(variable = "tmax"):
     data = load_data()
     engineered_df_list = []
-    k_list = None
-    if variable == "tmax":
-        k_list = optimal_k_vals # for tmax
-    else: # if variable == tmin
-        k_list = tmin_optimal_k_vals
+    k_list = optimal_k_vals if (variable == "tmax") else tmin_optimal_k_vals
+
     for df, cityName in zip(data, weather_station_coords.keys()):
         engineered_df = df.copy()
         
@@ -28,6 +26,7 @@ def create_fourier_features(variable = "tmax"):
         engineered_df["day_of_year"] = engineered_df.index.dayofyear
 
         optimal_k = int(k_list[cityName])
+        print(f"{cityName} needs {optimal_k} fourier terms for predicting {variable}")
         for j in range(1, optimal_k+1):
             engineered_df[f"Fsin{j}"] = np.sin(j*2*np.pi*engineered_df["day_of_year"]/365)
             engineered_df[f"Fcos{j}"] = np.cos(j*2*np.pi*engineered_df["day_of_year"]/365)
@@ -36,9 +35,9 @@ def create_fourier_features(variable = "tmax"):
     
 def store_data(data, variable = "tmax"):
     for df, cityName in zip(data, weather_station_coords.keys()):
-        print(f"Storing {variable} engineered data for {cityName}...")
         df.to_csv(DATA_PROCESSED / f"{cityName}_{variable}_weather_data.csv")
+        print(f"Stored to data/processed: {cityName}_{variable}_weather_data.csv")
 
 def engineer_and_store_data(variable = "tmax"):
-    engineered_df_list = create_fourier_features()
+    engineered_df_list = create_fourier_features(variable)
     store_data(engineered_df_list, variable)

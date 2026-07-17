@@ -10,6 +10,7 @@ def load_residual_models(variable="tmax", lag=3):
     for location in weather_station_coords.keys():
         with open(AUTOREGRESSION_MODELS / f"AR({lag})_{location}_{variable}.pkl", "rb") as f:
             model_list.append(pickle.load(f))
+        print(f"Loaded from model/residual_autoregression_models: AR({lag})_{location}_{variable}.pkl")
     return model_list
 
 def day_transform(day,k):
@@ -35,6 +36,7 @@ def residual_transform(prev_temps,day, city, variable="tmax"):
 def extrema_approximation_all(prev_temps, day, variable="tmax"):
     lag = len(prev_temps)
     approximation_list = []
+    print(variable)
     fourier_model = load_models(variable)
     residual_model = load_residual_models(variable, lag)
 
@@ -46,6 +48,8 @@ def extrema_approximation_all(prev_temps, day, variable="tmax"):
         
         our_k_vals = optimal_k_vals if (variable == "tmax") else tmin_optimal_k_vals
         transformed_day = day_transform(day, our_k_vals[city])
+        print(f"k-val = {our_k_vals[city]}")
+        print(transformed_day)
         approximation = city_fourier_model.predict([transformed_day])[0] +city_residual_model.predict([residual_transform(prev_temps, day, city, variable)])[0]
         approximation_list.append(approximation)
 

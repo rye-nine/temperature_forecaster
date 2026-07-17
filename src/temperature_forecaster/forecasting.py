@@ -57,10 +57,6 @@ def run_forecasting(mode,day, prev_temps, minimum, maximum, city=None, variable=
                 dict[city] = get_empirical_probability(day, prev_temps, city, minimum, maximum, variable)
         #print(dict)
         return dict
-    probabs = None
-    if mode == 1:
-        probabs = get_probability(day, prev_temps, city, minimum, maximum, variable)
-    else:
-        probabs = get_empirical_probability(day,prev_temps, city, minimum, maximum, variable)
+    probabs = get_probability(day, prev_temps, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day,prev_temps, city, minimum, maximum, variable)
     #print(f"Probabilities for {city}: {probabs}")
     return probabs

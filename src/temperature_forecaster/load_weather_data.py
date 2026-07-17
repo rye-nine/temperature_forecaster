@@ -39,8 +39,9 @@ from datetime import date
 import meteostat as ms # type: ignore
 from temperature_forecaster.__init__ import weather_station_coords
 from temperature_forecaster.find_optimize_fourier_terms import optimize_fourier_terms
+from temperature_forecaster.paths import DATA_RAW
 
-
+# NOTE TO SELF: please change the location of these vars
 optimal_k_vals =  optimize_fourier_terms(max_k=10, variable="tmax")
 tmin_optimal_k_vals =  optimize_fourier_terms(max_k=10, variable="tmin")
 
@@ -85,4 +86,5 @@ def load_df(location):
 def load_data():
     for location in weather_station_coords.keys():
         df = load_df(location)
-        df.to_csv(f"../data/raw/{location}_weather_data.csv")
+        df.to_csv(DATA_RAW / f"{location}_weather_data.csv")
+        print(f"Stored in data/raw: {location}_weather_data.csv")

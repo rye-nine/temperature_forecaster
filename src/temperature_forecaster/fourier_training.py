@@ -9,6 +9,7 @@ def load_engineered_data(variable = "tmax"):
     for location in weather_station_coords.keys():
         df = pd.read_csv(DATA_PROCESSED / f"{location}_{variable}_weather_data.csv", index_col=0, parse_dates=True)
         engineered_df_list.append(df)
+        print(f"Loaded from data/processed: {location}_{variable}_weather_data.csv")
     return engineered_df_list
 
 def train(variable="tmax"): #tmax or tmin
@@ -25,7 +26,8 @@ def train(variable="tmax"): #tmax or tmin
 def store(models, variable="tmax"):
     for model, cityName in zip(models, weather_station_coords.keys()):
         with open(FOURIER_MODELS / f"{cityName}_{variable}_fourier_model.pkl", "wb") as f:
-            pickle.dump(model, f) 
+            pickle.dump(model, f)
+        print(f"Stored to models/fourier_models: {cityName}_{variable}_fourier_model.pkl")
     
 def train_and_store_models(variable="tmax"):
     models = train(variable)

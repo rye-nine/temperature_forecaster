@@ -10,6 +10,7 @@ def load_models(variable="tmax"):
         with open(FOURIER_MODELS / f"{location}_{variable}_fourier_model.pkl", "rb") as f:
             model = pickle.load(f)
             model_list.append(model)
+        print(f"Loaded from models/fourier_models: {location}_{variable}_fourier_model.pkl")
     return model_list
 
 def get_residual_list(variable="tmax"):
@@ -21,6 +22,7 @@ def get_residual_list(variable="tmax"):
         df_residual = df.copy()
         cols = df_residual.columns[df_residual.columns.str.contains("Fsin|Fcos")]
         X = df_residual[cols]
+        print(X)
         
         df_residual["predictions"] = model.predict(X)
         df_residual["residuals"] =  df_residual[variable] - df_residual["predictions"] 
@@ -54,6 +56,7 @@ def store(models, variable, lag=3):
         target = AUTOREGRESSION_MODELS / f"AR({lag})_{cityName}_{variable}.pkl"
         with open(target, "wb") as f:
             pickle.dump(model, f)
+        print(f"Stored to models/residual_autoregression_models: AR({lag})_{cityName}_{variable}.pkl")
 
 
 def train_and_store_autocorrelations(variable="tmax", lag=3):
