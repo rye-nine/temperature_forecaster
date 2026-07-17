@@ -49,14 +49,14 @@ def get_empirical_probability(day, prev_temps, city, minimum, maximum, variable 
 def run_forecasting(mode,day, prev_temps, minimum, maximum, city=None, variable="tmax"):
     city_names = list(weather_station_coords.keys())
     if (city is None): # no city is specified
-        dict = {}
+        my_dict = {}
         for city in city_names:
             if mode == 1:
-                dict[city] = get_probability(day, prev_temps, city, minimum, maximum, variable)
+                my_dict[city] = get_probability(day, prev_temps, city, minimum, maximum, variable)
             else:
-                dict[city] = get_empirical_probability(day, prev_temps, city, minimum, maximum, variable)
-        #print(dict)
-        return dict
+                my_dict[city] = get_empirical_probability(day, prev_temps, city, minimum, maximum, variable)
+        #print(my_dict)
+        return my_dict
     probabs = get_probability(day, prev_temps, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day,prev_temps, city, minimum, maximum, variable)
     #print(f"Probabilities for {city}: {probabs}")
     return probabs
