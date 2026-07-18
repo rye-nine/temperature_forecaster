@@ -11,7 +11,7 @@ from temperature_forecaster.residual_autocorrelation import train_and_store_auto
 
 
 #populate_charts(variable = "tmin", open_charts=True)
-print(get_empirical_probability(196, [94, 93, 94], "Miami", 94,100, variable = "tmin"))
+print(get_empirical_probability(196, [94, 93, 94], "Miami", 85,100, variable = "tmin"))
 #print(run_forecasting(2, 196, [94,93,94], 80,105, city="Miami", variable="tmin"))
 
 #engineer_and_store_data("tmax")

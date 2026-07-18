@@ -2,8 +2,11 @@ import pandas as pd
 import numpy as np
 
 from temperature_forecaster.__init__ import weather_station_coords
-from temperature_forecaster.load_weather_data import optimal_k_vals, tmin_optimal_k_vals
 from temperature_forecaster.paths import DATA_RAW, DATA_PROCESSED
+from temperature_forecaster.find_optimize_fourier_terms import optimize_fourier_terms
+
+optimal_k_vals =  optimize_fourier_terms(max_k=10, variable="tmax")
+tmin_optimal_k_vals =  optimize_fourier_terms(max_k=10, variable="tmin")
 
 def load_data(): # loads RAW data 
     loaded_data = []

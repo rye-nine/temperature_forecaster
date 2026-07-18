@@ -41,20 +41,6 @@ from temperature_forecaster.__init__ import weather_station_coords
 from temperature_forecaster.find_optimize_fourier_terms import optimize_fourier_terms
 from temperature_forecaster.paths import DATA_RAW
 
-# NOTE TO SELF: please change the location of these vars
-optimal_k_vals =  optimize_fourier_terms(max_k=10, variable="tmax")
-tmin_optimal_k_vals =  optimize_fourier_terms(max_k=10, variable="tmin")
-
-# optimal_k_vals = {
-#     'LA': 1,
-#     'NYC': 3,
-#     'Chicago': 6,
-#     'Miami': 5,
-#     'Houston': 2,
-#     'Austin': 9,
-#     'Las Vegas': 3,
-#     'Phoenix': 2
-#     }
 
 def getCoords(locationName):
     return weather_station_coords[locationName]
