@@ -5,7 +5,7 @@ from temperature_forecaster.paths import PROJECT_ROOT
 
 # remove everything from data/raw and data/processed
 
-if (wipe_folder(PROJECT_ROOT / "data")):
+if (wipe_folder("data")):
     load_data()
     engineer_and_store_data("tmax")
     engineer_and_store_data("tmin")

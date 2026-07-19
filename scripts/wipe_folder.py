@@ -1,10 +1,11 @@
 # used as a helper script, practice caution when executing independently
 from pathlib import Path
+from temperature_forecaster.paths import PROJECT_ROOT
 
 # will wipe all .py files, including ones in all subdirectories
 def wipe_folder(folder_name):
 
-    directory = Path(folder_name) #if isinstance(folder_name, str) else Path(f"{folder_name}")
+    directory = Path(PROJECT_ROOT / folder_name) #if isinstance(folder_name, str) else Path(f"{folder_name}")
 
     if not directory.exists():
         print("Folder not found")

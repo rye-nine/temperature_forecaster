@@ -10,3 +10,5 @@ weather_station_coords = {
     "Las Vegas": (36.0801, -115.1522),
     "Phoenix": (33.4342, -112.0116)
 }
+
+

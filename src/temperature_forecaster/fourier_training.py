@@ -33,3 +33,30 @@ def train_and_store_models(variable="tmax"):
     models = train(variable)
     store(models, variable)
 
+# below is stuff for other scripts
+
+def load_models(variable="tmax"):
+    model_list = []
+    for location in weather_station_coords.keys():
+        with open(FOURIER_MODELS / f"{location}_{variable}_fourier_model.pkl", "rb") as f:
+            model = pickle.load(f)
+            model_list.append(model)
+        print(f"Loaded from models/fourier_models: {location}_{variable}_fourier_model.pkl")
+    return model_list
+
+def get_residual_list(variable="tmax"):
+    engineered_df_list = load_engineered_data(variable)
+    model_list = load_models(variable)
+    df_residuals_list = []
+    for df, model in zip(engineered_df_list, model_list):
+
+        df_residual = df.copy()
+        cols = df_residual.columns[df_residual.columns.str.contains("Fsin|Fcos")]
+        X = df_residual[cols]
+        print(X)
+        
+        df_residual["predictions"] = model.predict(X)
+        df_residual["residuals"] =  df_residual[variable] - df_residual["predictions"] 
+        df_residuals_list.append(df_residual)
+    return df_residuals_list
+
