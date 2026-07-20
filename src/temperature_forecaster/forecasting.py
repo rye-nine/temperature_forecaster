@@ -3,8 +3,8 @@ from temperature_forecaster.__init__ import weather_station_coords
 from temperature_forecaster.probability_model import get_final_residuals
 from scipy.stats import norm
 
-def get_probability(day, prev_temps, city, minimum, maximum, variable="tmax"):
-    all_distributions = normal_distribution_approximation(prev_temps, day, variable)
+def get_probability(day, city, minimum, maximum, variable="tmax"):
+    all_distributions = normal_distribution_approximation(day, variable)
 
     city_distribution = all_distributions[city]
 
@@ -20,7 +20,7 @@ def get_probability(day, prev_temps, city, minimum, maximum, variable="tmax"):
     return probabilities
 
 # testing
-def get_empirical_probability(day, prev_temps, city, minimum, maximum, variable = "tmax"):
+def get_empirical_probability(day, city, minimum, maximum, variable = "tmax"):
     df_with_residuals_list = get_final_residuals(variable)
     city_index = list(weather_station_coords.keys()).index(city)
     our_df = df_with_residuals_list[city_index]
@@ -33,7 +33,7 @@ def get_empirical_probability(day, prev_temps, city, minimum, maximum, variable 
     desired_residuals = list(good_df["final_residuals"])
 
     # just for getting the approximated extrema
-    all_distributions = normal_distribution_approximation(prev_temps, day, variable)
+    all_distributions = normal_distribution_approximation(day, variable)
     city_distribution = all_distributions[city]
     approximation = city_distribution[0]
 
@@ -46,17 +46,17 @@ def get_empirical_probability(day, prev_temps, city, minimum, maximum, variable 
 
 #mode = 1 --> normal distribution
 #mode = 2 --> empirical residual distribution
-def run_forecasting(mode,day, prev_temps, minimum, maximum, city=None, variable="tmax"):
+def run_forecasting(mode,day, minimum, maximum, city=None, variable="tmax"):
     city_names = list(weather_station_coords.keys())
     if (city is None): # no city is specified
         my_dict = {}
         for city in city_names:
             if mode == 1:
-                my_dict[city] = get_probability(day, prev_temps, city, minimum, maximum, variable)
+                my_dict[city] = get_probability(day, city, minimum, maximum, variable)
             else:
-                my_dict[city] = get_empirical_probability(day, prev_temps, city, minimum, maximum, variable)
+                my_dict[city] = get_empirical_probability(day, city, minimum, maximum, variable)
         #print(my_dict)
         return my_dict
-    probabs = get_probability(day, prev_temps, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day,prev_temps, city, minimum, maximum, variable)
+    probabs = get_probability(day, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day, city, minimum, maximum, variable)
     #print(f"Probabilities for {city}: {probabs}")
     return probabs

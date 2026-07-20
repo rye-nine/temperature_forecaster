@@ -40,10 +40,10 @@ def train_residual_models(variable="tmax"):
 def store(models, variable):
     opt_vals = optimal_ar_terms if (variable == "tmax") else tmin_optimal_ar_terms
     for model, cityName, lag in zip(models, weather_station_coords.keys(), opt_vals.values()):
-        target = AUTOREGRESSION_MODELS / f"AR({lag})_{cityName}_{variable}.pkl"
+        target = AUTOREGRESSION_MODELS / f"AR({int(lag)})_{cityName}_{variable}.pkl"
         with open(target, "wb") as f:
             pickle.dump(model, f)
-        print(f"Stored to models/residual_autoregression_models: AR({lag})_{cityName}_{variable}.pkl")
+        print(f"Stored to models/residual_autoregression_models: AR({int(lag)})_{cityName}_{variable}.pkl")
 
 
 def train_and_store_autocorrelations(variable="tmax"):

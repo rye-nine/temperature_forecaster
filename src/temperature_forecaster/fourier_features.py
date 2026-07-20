@@ -29,7 +29,6 @@ def create_fourier_features(variable = "tmax"):
         engineered_df["day_of_year"] = engineered_df.index.dayofyear
 
         optimal_k = int(k_list[cityName])
-        print(f"{cityName} needs {optimal_k} fourier terms for predicting {variable}")
         for j in range(1, optimal_k+1):
             engineered_df[f"Fsin{j}"] = np.sin(j*2*np.pi*engineered_df["day_of_year"]/365)
             engineered_df[f"Fcos{j}"] = np.cos(j*2*np.pi*engineered_df["day_of_year"]/365)

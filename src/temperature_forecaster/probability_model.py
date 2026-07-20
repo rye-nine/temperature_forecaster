@@ -1,16 +1,19 @@
-from temperature_forecaster.residual_autocorrelation import load_models, get_lagged_df
-from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.fourier_training import load_models
+from temperature_forecaster.residual_autocorrelation import get_lagged_df
+from temperature_forecaster.__init__ import weather_station_coords, get_temperatures
 from temperature_forecaster.fourier_features import optimal_k_vals, tmin_optimal_k_vals
 from temperature_forecaster.paths import AUTOREGRESSION_MODELS
+from temperature_forecaster.residual_autocorrelation import optimal_ar_terms, tmin_optimal_ar_terms
 import pickle
 import numpy as np
 
-def load_residual_models(variable="tmax", lag=3):
+def load_residual_models(variable="tmax"):
     model_list = []
-    for location in weather_station_coords.keys():
-        with open(AUTOREGRESSION_MODELS / f"AR({lag})_{location}_{variable}.pkl", "rb") as f:
+    ar_list = optimal_ar_terms if (variable == "tmax") else tmin_optimal_ar_terms
+    for location, opt_ar in zip(weather_station_coords.keys(), ar_list.values()):
+        with open(AUTOREGRESSION_MODELS / f"AR({int(opt_ar)})_{location}_{variable}.pkl", "rb") as f:
             model_list.append(pickle.load(f))
-        print(f"Loaded from model/residual_autoregression_models: AR({lag})_{location}_{variable}.pkl")
+        print(f"Loaded from model/residual_autoregression_models: AR({int(opt_ar)})_{location}_{variable}.pkl")
     return model_list
 
 def day_transform(day,k):
@@ -33,28 +36,37 @@ def residual_transform(prev_temps,day, city, variable="tmax"):
         residual_list.append(residual)
     return residual_list
 
-def extrema_approximation_all(prev_temps, day, variable="tmax"):
-    lag = len(prev_temps)
-    approximation_list = []
-    print(variable)
-    fourier_model = load_models(variable)
-    residual_model = load_residual_models(variable, lag)
+# helper function
+def get_prev_temps(variable = "tmax"):
+    optimal_ar = optimal_ar_terms if (variable == "tmax") else tmin_optimal_ar_terms
+    # the idea is that we'll return a dictionary of each city and their prev temps in accordance to optimal ar terms
+    prev_temps_dict = {}
+    for city, optimal_terms in zip(weather_station_coords.keys(), optimal_ar.values()):
+        coords = weather_station_coords[city]
+        prev_temps_dict[city] = get_temperatures(coords[0],coords[1], int(optimal_terms))
+    return prev_temps_dict
 
+
+def extrema_approximation_all(day, variable="tmax"): # after implementing get_prev_temps, will no longer need a prev_temps parameter
+    approximation_list = []
+    fourier_model = load_models(variable)
+    residual_model = load_residual_models(variable)
+    dict_prev_temps = get_prev_temps(variable)
+
+    our_k_vals = optimal_k_vals if (variable == "tmax") else tmin_optimal_k_vals
     for city in weather_station_coords.keys():
 
         index = list(weather_station_coords.keys()).index(city)
         city_fourier_model = fourier_model[index]
         city_residual_model = residual_model[index]
         
-        our_k_vals = optimal_k_vals if (variable == "tmax") else tmin_optimal_k_vals
         transformed_day = day_transform(day, our_k_vals[city])
-        print(f"k-val = {our_k_vals[city]}")
-        print(transformed_day)
-        approximation = city_fourier_model.predict([transformed_day])[0] +city_residual_model.predict([residual_transform(prev_temps, day, city, variable)])[0]
+        approximation = city_fourier_model.predict([transformed_day])[0] +city_residual_model.predict([residual_transform(dict_prev_temps[city], day, city, variable)])[0]
         approximation_list.append(approximation)
 
     return approximation_list
 
+# investigate this function
 def get_final_residuals(variable="tmax"):
     initial_residuals = get_lagged_df(variable)
 
@@ -93,9 +105,9 @@ def get_all_std(day, day_range=15, variable="tmax"):
         standard_deviation_list.append((city, standard_deviation))
     return standard_deviation_list
 
-def normal_distribution_approximation(prev_temps, day, variable="tmax"):
+def normal_distribution_approximation(day, variable="tmax"):
     city_names = list(weather_station_coords.keys())
-    mean_list = extrema_approximation_all(prev_temps, day, variable)
+    mean_list = extrema_approximation_all(day, variable)
     std_list = get_all_std(day,15, variable)
 
     vals = [(mean, std) for mean, (_, std) in zip(mean_list, std_list)]

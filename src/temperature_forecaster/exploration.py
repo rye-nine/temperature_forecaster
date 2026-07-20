@@ -13,6 +13,7 @@ import pickle
 
 from temperature_forecaster.probability_model import get_final_residuals
 from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.paths import PROJECT_ROOT
 
 def get_ts(city, df_list, variable = "tmax"):
     city_index = (list(weather_station_coords.keys())).index(city)
@@ -126,7 +127,7 @@ def get_charts(city = None, variable = "tmax"):
     #os.startfile(f"{city}.html")  # Windows only
     print(f"Created charts for {city}")
 
-    with open(f"charts/{city}_{variable}.html", "w", encoding="utf-8") as f:
+    with open(PROJECT_ROOT / f"charts/diagnostics/{city}_{variable}.html", "w", encoding="utf-8") as f:
         f.write(html)
 
     return html
@@ -136,6 +137,6 @@ def populate_charts(variable = "tmax", open_charts = False): # used for populati
     for city in city_names:
         get_charts(city, variable)
         if (open_charts):
-            output = Path("charts") / f"{city}_{variable}.html"
+            output = PROJECT_ROOT / f"charts/diagnostics/{city}_{variable}.html" # formerly Path("charts") / ...
             os.startfile(output) # Windows only
     print("Open a chart by running the following command in root folder: start charts/[city_name].html")

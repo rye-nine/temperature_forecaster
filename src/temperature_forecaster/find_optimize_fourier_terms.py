@@ -102,5 +102,5 @@ def optimize_fourier_terms(max_k=10, variable="tmax"):
     k_dict = {}
     for i,key in enumerate(weather_station_coords):
         k_dict[key] = optimal_k_values[i] 
-    #print(k_dict)
+    print(f"Here is our FOURIER dictionary: {k_dict}")
     return k_dict

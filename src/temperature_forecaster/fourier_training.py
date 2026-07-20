@@ -53,7 +53,6 @@ def get_residual_list(variable="tmax"):
         df_residual = df.copy()
         cols = df_residual.columns[df_residual.columns.str.contains("Fsin|Fcos")]
         X = df_residual[cols]
-        print(X)
         
         df_residual["predictions"] = model.predict(X)
         df_residual["residuals"] =  df_residual[variable] - df_residual["predictions"] 

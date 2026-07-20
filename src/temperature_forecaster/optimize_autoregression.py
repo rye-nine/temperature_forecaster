@@ -80,5 +80,5 @@ def optimize_autoregressive_terms(max_shift = 10, variable = "tmax"):
     shift_dict = {}
     for i,key in enumerate(weather_station_coords):
         shift_dict[key] = optimal_shift_values[i] 
-    print(shift_dict)
+    print(f"this is our AUTOREGRESSION dictionary: {shift_dict}")
     return shift_dict
