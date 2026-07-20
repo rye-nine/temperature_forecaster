@@ -1,6 +1,6 @@
 from temperature_forecaster.fourier_training import load_models
 from temperature_forecaster.residual_autocorrelation import get_lagged_df
-from temperature_forecaster.__init__ import weather_station_coords, get_temperatures
+from temperature_forecaster.__init__ import weather_station_coords, get_temperatures, overriden_past_MAX_temps, overriden_past_MIN_temps
 from temperature_forecaster.fourier_features import optimal_k_vals, tmin_optimal_k_vals
 from temperature_forecaster.paths import AUTOREGRESSION_MODELS
 from temperature_forecaster.residual_autocorrelation import optimal_ar_terms, tmin_optimal_ar_terms
@@ -36,14 +36,16 @@ def residual_transform(prev_temps,day, city, variable="tmax"):
         residual_list.append(residual)
     return residual_list
 
-# helper function
-def get_prev_temps(variable = "tmax"):
+# helper function, this is the only function that uses the get_temperatures function from __init__.py
+def get_prev_temps(variable = "tmax", override = True):
     optimal_ar = optimal_ar_terms if (variable == "tmax") else tmin_optimal_ar_terms
     # the idea is that we'll return a dictionary of each city and their prev temps in accordance to optimal ar terms
     prev_temps_dict = {}
     for city, optimal_terms in zip(weather_station_coords.keys(), optimal_ar.values()):
         coords = weather_station_coords[city]
         prev_temps_dict[city] = get_temperatures(coords[0],coords[1], int(optimal_terms))
+    if override:
+        
     return prev_temps_dict
 
 

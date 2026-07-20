@@ -13,12 +13,12 @@ from temperature_forecaster.__init__ import weather_station_coords, get_temperat
 
 #populate_charts(variable = "tmin", open_charts=True)
 #print(get_empirical_probability(196, [94, 93, 94], "Miami", 85,100, variable = "tmin"))
-#print(run_forecasting(2, 196, [94,93,94], 80,105, city="Miami", variable="tmin"))
+print(run_forecasting(2, 196, 80,105, city="Miami", variable="tmin"))
 
 #engineer_and_store_data("tmax")
 #engineer_and_store_data("tmin")
 
-miami_coords = weather_station_coords["Miami"]
-get_temperatures(miami_coords[0], miami_coords[1], 3, "tmax")
+#miami_coords = weather_station_coords["Miami"]
+#get_temperatures(miami_coords[0], miami_coords[1], 3, "tmax")
 
 
