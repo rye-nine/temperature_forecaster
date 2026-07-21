@@ -5,8 +5,10 @@ from datetime import datetime
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-import altair as alt
+import altair as alt # type: ignore
 import numpy as np
+import pickle
+from temperature_forecaster.paths import PROJECT_ROOT
 
 def compute_heuristics(shift=10, variable="tmax"):
     current_year = datetime.now().year
@@ -66,19 +68,46 @@ def compute_heuristics(shift=10, variable="tmax"):
         )
 
         # append to the chart_list
-        chart_list.append((c1,c2))
+        chart_list.append(c1+c2)
         heuristics_list.append(df_heuristics)
     return heuristics_list, chart_list
 
-def store_charts():
-    return NotImplementedError
 
-def optimize_autoregressive_terms(max_shift = 10, variable = "tmax"):
+
+def optimize_autoregressive_terms(max_shift = 10, variable = "tmax", only_charts = False):
     heuristics_list, chart_list = compute_heuristics(max_shift, variable)
-    #display_charts(chart_list)
+    store_charts(chart_list,heuristics_list,variable)
+    if only_charts:
+        return 
     optimal_shift_values = find_optimal_k_values(heuristics_list) # i know it's called k values but ignore it, it's shift values
     shift_dict = {}
-    for i,key in enumerate(weather_station_coords):
+    for i,key in enumerate(weather_station_coords.keys()):
         shift_dict[key] = optimal_shift_values[i] 
-    print(f"this is our AUTOREGRESSION dictionary: {shift_dict}")
+    print(f"this is our AUTOREGRESSION_{variable} dictionary: {shift_dict}")
     return shift_dict
+
+def store_charts(charts_lst, h_charts, variable = "tmax"):
+    for bv_chart, city_name, heuristics_chart in zip(charts_lst, weather_station_coords.keys(), h_charts):
+        html = f"""
+        <html> 
+
+        <body>
+
+        <h1>{city_name}_{variable} Bias-Variance Graph</h1>
+
+        {bv_chart.to_html()}
+
+        <hr>
+
+        <h2>Heuristics DataFrame</h2>
+
+        {heuristics_chart.to_html()}
+
+        </body>
+
+        </html>
+        """
+        with open(PROJECT_ROOT / f"charts/bias_variance/{city_name}_{variable}.html", "w", encoding="utf-8") as f:
+            print(f"stored BV chart: {city_name}")
+            f.write(html)
+    

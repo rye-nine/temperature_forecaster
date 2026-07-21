@@ -1,0 +1,131 @@
+
+        <html> 
+
+        <body>
+
+        <h1>Chicago_tmax Bias-Variance Graph</h1>
+
+        <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@6"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@6.4.1"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@7"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "layer": [{"data": {"name": "data-9594c4349b319f62bad95337dfb7b35f"}, "mark": {"type": "line", "color": "red"}, "encoding": {"x": {"field": "shift_amount", "type": "quantitative"}, "y": {"field": "train_MSE", "type": "quantitative"}}}, {"data": {"name": "data-9594c4349b319f62bad95337dfb7b35f"}, "mark": {"type": "line", "color": "blue"}, "encoding": {"x": {"field": "shift_amount", "type": "quantitative"}, "y": {"field": "test_MSE", "type": "quantitative"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json", "datasets": {"data-9594c4349b319f62bad95337dfb7b35f": [{"shift_amount": 1.0, "train_MSE": 395.4052789911566, "test_MSE": 433.7893448818555}, {"shift_amount": 2.0, "train_MSE": 394.6759003596638, "test_MSE": 432.7386880172713}, {"shift_amount": 3.0, "train_MSE": 394.16906521781345, "test_MSE": 430.6920821766193}, {"shift_amount": 4.0, "train_MSE": 394.13061580083934, "test_MSE": 431.1838219599363}, {"shift_amount": 5.0, "train_MSE": 394.0164361642524, "test_MSE": 431.9292806206444}, {"shift_amount": 6.0, "train_MSE": 393.98618471976636, "test_MSE": 431.7305537329527}, {"shift_amount": 7.0, "train_MSE": 393.97733108334836, "test_MSE": 432.0151342019447}, {"shift_amount": 8.0, "train_MSE": 393.95415900735173, "test_MSE": 432.02352232989995}, {"shift_amount": 9.0, "train_MSE": 393.9529520460743, "test_MSE": 432.0808348158266}, {"shift_amount": 10.0, "train_MSE": 393.9448631355258, "test_MSE": 432.4688789872649}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>
+
+        <hr>
+
+        <h2>Heuristics DataFrame</h2>
+
+        <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>shift_amount</th>
+      <th>train_MSE</th>
+      <th>test_MSE</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>395.405279</td>
+      <td>433.789345</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2.0</td>
+      <td>394.675900</td>
+      <td>432.738688</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3.0</td>
+      <td>394.169065</td>
+      <td>430.692082</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>4.0</td>
+      <td>394.130616</td>
+      <td>431.183822</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>5.0</td>
+      <td>394.016436</td>
+      <td>431.929281</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>6.0</td>
+      <td>393.986185</td>
+      <td>431.730554</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>7.0</td>
+      <td>393.977331</td>
+      <td>432.015134</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>8.0</td>
+      <td>393.954159</td>
+      <td>432.023522</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>9.0</td>
+      <td>393.952952</td>
+      <td>432.080835</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>10.0</td>
+      <td>393.944863</td>
+      <td>432.468879</td>
+    </tr>
+  </tbody>
+</table>
+
+        </body>
+
+        </html>
+        

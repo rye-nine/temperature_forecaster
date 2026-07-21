@@ -1,6 +1,6 @@
 # im a little concerned that i copy and pasted a lot (like the city index stuff)
 
-import altair as alt
+import altair as alt # type: ignore
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -9,7 +9,6 @@ import os
 from pathlib import Path
 import io 
 import base64
-import pickle
 
 from temperature_forecaster.probability_model import get_final_residuals
 from temperature_forecaster.__init__ import weather_station_coords
@@ -125,7 +124,7 @@ def get_charts(city = None, variable = "tmax"):
 
     #ts_charts.save(f"charts/{city}_.html")
     #os.startfile(f"{city}.html")  # Windows only
-    print(f"Created charts for {city}")
+    print(f"Created diagnostics charts for {city}")
 
     with open(PROJECT_ROOT / f"charts/diagnostics/{city}_{variable}.html", "w", encoding="utf-8") as f:
         f.write(html)
