@@ -5,7 +5,7 @@
 
 from temperature_forecaster.forecasting import run_forecasting
 from temperature_forecaster.fourier_features import load_data
-from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.__init__ import weather_station_coords, overriden_past_MAX_temps, overriden_past_MIN_temps
 # get_final_residuals is a function that returns a list of 
 # dataframes that has all of the features and the final predictions
 # and residuals
@@ -13,30 +13,34 @@ from temperature_forecaster.__init__ import weather_station_coords
 import pandas as pd 
 import numpy as np
 
-def form_data(lag = 3):
+def form_data(variable = "tmax")
     raw_data = load_data()
     return_list = []
-    for df in raw_data:
+    opt_shift_values = overriden_past_MAX_temps if (variable == "tmax") else overriden_past_MIN_temps
+    for df, city in zip(raw_data, weather_station_coords.keys()):
         df_copy = df.copy()
-        df_copy = df_copy[["tmax","tmin","day_of_year"]]
+        df_copy = df_copy[[variable, "day_of_year"]]
+        lag = int(opt_shift_values[city])
         for j in range(1, lag+1):
             df_copy[f"lag_{j}"] = df_copy["tmax"].shift(j)
         df_copy = df_copy.dropna(axis = 0)
         return_list.append(df_copy)
     return return_list
+
+def vectorized_forecasting(mode, day_col, MIN, MAX, city, variable = "tmax"):
+    raise NotImplementedError
     
     
-def calibrate_one_interval(min, max, city_name, lag = 3, variable_name = "tmax"):
+def calibrate_one_interval(MIN, MAX, city_name, variable_name = "tmax"):
     city_index = list(weather_station_coords.keys()).index(city_name)
-    df_list = form_data(lag)
+    df_list = form_data()
     
     df = df_list[city_index]
-    df[f"[{min}, {max}]-probability"] = df.apply(
+    df[f"[{MIN}, {MAX}]-probability"] = df.apply(
         lambda row: run_forecasting(
             row["day_of_year"], 
-            [row[f"lag_{i}"] for i in range(1, lag+1)], 
-            minimum=min, 
-            maximum=max, 
+            minimum=MIN, 
+            maximum=MAX, 
             city=city_name, 
             variable=variable_name
         )[0][1],
