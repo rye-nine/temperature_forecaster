@@ -37,7 +37,7 @@ def residual_transform(prev_temps,day, city, variable="tmax"):
     return residual_list
 
 # helper function, this is the only function that uses the get_temperatures function from __init__.py
-def get_prev_temps(variable = "tmax", override = True):
+def get_prev_temps(variable = "tmax", override = False):
     optimal_ar = optimal_ar_terms if (variable == "tmax") else tmin_optimal_ar_terms
     # the idea is that we'll return a dictionary of each city and their prev temps in accordance to optimal ar terms
     prev_temps_dict = {}
@@ -45,7 +45,7 @@ def get_prev_temps(variable = "tmax", override = True):
         coords = weather_station_coords[city]
         prev_temps_dict[city] = get_temperatures(coords[0],coords[1], int(optimal_terms))
     if override:
-        
+        return overriden_past_MAX_temps if (variable == "tmax") else overriden_past_MIN_temps
     return prev_temps_dict
 
 

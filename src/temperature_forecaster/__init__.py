@@ -13,9 +13,9 @@ weather_station_coords = {
 }
 
 overriden_past_MAX_temps = {
-        "example_city": [67,67,67]
+            "LA": [2]
         }
-override_past_MIN_temps = {
+overriden_past_MIN_temps = {
         "example": [42]
         }
 

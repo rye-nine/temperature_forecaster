@@ -14,9 +14,11 @@ def get_probability(day, city, minimum, maximum, variable="tmax"):
     #print("sigma: ", sigma)
 
     probabilities = []
-    for j in range(minimum, maximum):
-        prob = norm.cdf(j + 1, loc=mu, scale=sigma) - norm.cdf(j, loc=mu, scale=sigma)
-        probabilities.append(((j, j+1),prob))
+    for j in range(minimum, maximum-1, 2):
+        lower = j
+        upper = j+2
+        prob = norm.cdf(upper, loc=mu, scale=sigma) - norm.cdf(lower, loc=mu, scale=sigma)
+        probabilities.append(((lower, upper),prob))
     return probabilities
 
 # testing
@@ -38,10 +40,12 @@ def get_empirical_probability(day, city, minimum, maximum, variable = "tmax"):
     approximation = city_distribution[0]
 
     probabilities = []
-    for i in range(minimum, maximum):
-        observed = (desired_residuals >= i-approximation) & (desired_residuals < i+1-approximation)
+    for i in range(minimum, maximum - 1, 2):
+        lower = i
+        upper = i + 2
+        observed = (desired_residuals >= lower-approximation) & (desired_residuals < upper-approximation) # [ )
         prob = observed.sum() / len(desired_residuals)
-        probabilities.append(((i,i+1), prob))
+        probabilities.append(((lower, upper), prob))
     return probabilities
 
 #mode = 1 --> normal distribution
