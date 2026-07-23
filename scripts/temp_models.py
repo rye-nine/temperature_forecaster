@@ -3,9 +3,7 @@
 from wipe_folder import wipe_folder
 from temperature_forecaster.fourier_training import train_and_store_models
 from temperature_forecaster.paths import ROOT
+from temperature_forecaster.__init__ import weather_station_coords
 
-if(wipe_folder("models/fourier_models")):
-    train_and_store_models("tmax")
-    train_and_store_models("tmin")
-else:
-    print("could not wipe")
+for city in weather_station_coords.keys():
+    print()

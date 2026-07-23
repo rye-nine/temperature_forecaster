@@ -5,8 +5,6 @@ from scipy.stats import norm
 import pandas as pd
 
 def get_probability(day, city, minimum, maximum, variable="tmax"):
-    if (isinstance(day, pd.Series)):
-        raise NotImplementedError
     all_distributions = normal_distribution_approximation(day, variable)
 
     city_distribution = all_distributions[city]
@@ -54,14 +52,11 @@ def get_empirical_probability(day, city, minimum, maximum, variable = "tmax"):
 #mode = 1 --> normal distribution
 #mode = 2 --> empirical residual distribution
 def run_forecasting(mode,day, minimum, maximum, city=None, variable="tmax"):
-    if (isinstance(day, pd.Series):
-        raise NotImplementedError
     city_names = list(weather_station_coords.keys())
     if (city is None): # no city is specified
         my_dict = {}
         for city in city_names:
-            if mode == 1:
-        my_dict[city] = get_probability(day, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day, city, minimum, maximum, variable)
+            my_dict[city] = get_probability(day, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day, city, minimum, maximum, variable)
         #print(my_dict)
         return my_dict
     probabs = get_probability(day, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day, city, minimum, maximum, variable)
