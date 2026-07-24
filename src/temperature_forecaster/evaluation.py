@@ -54,7 +54,7 @@ def calibrate_one_interval(mode, MIN, MAX, city_name, variable_name = "tmax"):
     df_list = form_data()
     
     df = df_list[city_index]
-    df[f"[{MIN}, {MAX}]-probability"] = run_forecasting(mode, df["day_of_year"], minimum=MIN, maximum=MAX,city=city_name, variable=variable_name)
+    df[f"[{MIN}, {MAX}]-probability"] = run_forecasting(mode, df["day_of_year"], minimum=MIN, maximum=MAX,city=city_name, variable=variable_name)[0][1]
     # df.apply(
     #     lambda row: run_forecasting(
     #         mode,

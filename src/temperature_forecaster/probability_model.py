@@ -27,7 +27,7 @@ def day_transform(day,k):
     return [item for pair in zip(list1,list2) for item in pair]
 
 # helper function, this is the only function that uses the get_temperatures function from __init__.py
-def get_prev_temps(variable = "tmax", override = False):
+def get_prev_temps(variable = "tmax", override = False): # this is dynamic (uses optimal AR terms)
     optimal_ar = optimal_ar_terms if (variable == "tmax") else tmin_optimal_ar_terms
     # the idea is that we'll return a dictionary of each city and their prev temps in accordance to optimal ar terms
     prev_temps_dict = {}
@@ -105,11 +105,16 @@ def get_final_residuals(variable="tmax"):
 
     return final_residuals_dataframes
 
+t_max_df_with_residuals_list = get_final_residuals("tmax") # for get_all_std variable
+t_min_df_with_residuals_list = get_final_residuals("tmin")
 def get_all_std(day, day_range=15, variable="tmax"):
-    df_with_residuals_list = get_final_residuals(variable)
+    if (isinstance(day, pd.Series)):
+        days_list = list(day)
+        return [get_all_std(days_list[i], day_range, variable) for i in range(len(days_list))]
     city_names = list(weather_station_coords.keys())
     standard_deviation_list = []
-    for df_with_residuals, city in zip(df_with_residuals_list, city_names):
+    iterate_list = t_max_df_with_residuals_list if (variable == "tmax") else t_min_df_with_residuals_list
+    for df_with_residuals, city in zip(iterate_list, city_names):
         df_temp = df_with_residuals.copy()
         
         bool1 = df_temp["day_of_year"] >= day - day_range
