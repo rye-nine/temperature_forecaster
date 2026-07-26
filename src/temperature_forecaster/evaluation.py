@@ -8,7 +8,7 @@ from temperature_forecaster.fourier_features import load_data
 from temperature_forecaster.__init__ import weather_station_coords
 from temperature_forecaster.residual_autocorrelation import optimal_ar_terms, tmin_optimal_ar_terms
 from temperature_forecaster.fourier_training import load_models
-from temperature_forecaster.probability_model import load_residual_models
+from temperature_forecaster.probability_model import load_residual_models, get_final_residuals, get_all_std
 # get_final_residuals is a function that returns a list of 
 # dataframes that has all of the features and the final predictions
 # and residuals
@@ -30,8 +30,10 @@ def form_data(variable = "tmax"):
         return_list.append(df_copy)
     return return_list
 
-def vectorized_day_transform(days):
-    raise NotImplementedError
+def vectorized_std(days_series, city, variable_name = "tmax"): # intakes a pd.Series
+    return_thing = get_all_std(days_series, variable = variable_name, city_target = city)
+    print([lst[0][1] for lst in return_thing])
+    return [lst[0][1] for lst in return_thing]
 
 def vectorized_forecasting(mode, day_col, MIN, MAX, city, variable = "tmax"):
     # the general idea is that given a pd.Series object that contains the days of the year, our goal is to...
@@ -40,11 +42,19 @@ def vectorized_forecasting(mode, day_col, MIN, MAX, city, variable = "tmax"):
     # this will typically use mode = 1 (use normal distribution) 
     all_city_fourier_models = load_models(variable)
     all_city_AR_models = load_residual_models(variable)
-    
+    residual_dfs = get_final_residuals(variable) # get both fourier features and AR features
+
     city_index = list(weather_station_coords.keys()).index(city)
     city_fm = all_city_fourier_models[city_index]
     city_am = all_city_AR_models[city_index]
-    raise NotImplementedError
+    city_residual_df = residual_dfs[city_index]
+
+    df = city_residual_df.copy()
+    df["std_devs"] = vectorized_std(day_col, city, variable)
+    print(df["std_devs"])
+    df["tuple_gaussian"] = list(zip(df["final_prediction"], df["std_devs"]))
+    return df["tuple_gaussian"]
+    # implement "mode" btw
 
 #mode = 1 --> normal distribution
 #mode = 2 --> empirical residual distribution
@@ -54,7 +64,7 @@ def calibrate_one_interval(mode, MIN, MAX, city_name, variable_name = "tmax"):
     df_list = form_data()
     
     df = df_list[city_index]
-    df[f"[{MIN}, {MAX}]-probability"] = run_forecasting(mode, df["day_of_year"], minimum=MIN, maximum=MAX,city=city_name, variable=variable_name)[0][1]
+    df[f"[{MIN}, {MAX}]-probability"] = vectorized_forecasting(1, df["day_of_year"], MIN, MAX, city_name, variable_name) 
     # df.apply(
     #     lambda row: run_forecasting(
     #         mode,
@@ -68,8 +78,8 @@ def calibrate_one_interval(mode, MIN, MAX, city_name, variable_name = "tmax"):
     #)
 
     df["outcome"] = (
-    (min <= df[variable_name]) &
-    (df[variable_name] <= max)
+    (MIN <= df[variable_name]) &
+    (df[variable_name] <= MAX)
     )
     df["outcome"] = df["outcome"].astype(int)
     return df 

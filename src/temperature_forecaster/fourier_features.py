@@ -14,7 +14,7 @@ def load_data(): # loads RAW data
         df = pd.read_csv(DATA_RAW/f"{location}_weather_data.csv", index_col=0, parse_dates=True)
         df["day_of_year"] = df.index.dayofyear
         loaded_data.append(df)
-        print(f"Loaded from data/raw: {location}_weather_data.csv") 
+        print(f"[src/temperature_forecaster/fourier_features.py, load_data()]: Loaded from data/raw: {location}_weather_data.csv") 
     return loaded_data
 
 def create_fourier_features(variable = "tmax"):
@@ -38,7 +38,7 @@ def create_fourier_features(variable = "tmax"):
 def store_data(data, variable = "tmax"):
     for df, cityName in zip(data, weather_station_coords.keys()):
         df.to_csv(DATA_PROCESSED / f"{cityName}_{variable}_weather_data.csv")
-        print(f"Stored to data/processed: {cityName}_{variable}_weather_data.csv")
+        print(f"[src/temperature_forecaster/fourier_features.py, store_data()]: Stored to data/processed: {cityName}_{variable}_weather_data.csv")
 
 def engineer_and_store_data(variable = "tmax"):
     engineered_df_list = create_fourier_features(variable)

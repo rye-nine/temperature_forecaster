@@ -13,10 +13,24 @@ weather_station_coords = {
 }
 
 overriden_past_MAX_temps = {
-            "LA": [2]
+            "LA": [80, 77], # needs 2
+            "NYC": [79], # needs 1
+            "Chicago": [78, 74, 87], # needs 3
+            "Miami": [93], # needs 1
+            "Houston": [92, 102], # needs 2
+            "Austin": [98, 103], # needs 2
+            "Las Vegas": [111, 107], # needs 2
+            "Phoenix": [114, 107] # needs 2 
         }
 overriden_past_MIN_temps = {
-        "example": [42]
+            "LA": [68], # needs 1
+            "NYC": [64], # needs 1
+            "Chicago": [58, 60, 66, 65, 68, 70, 75], # needs 7
+            "Miami": [82], # needs 1
+            "Houston": [77, 80, 77], # needs 3
+            "Austin": [82, 78, 74, 74], # needs 4
+            "Las Vegas": [88, 86], # needs 2
+            "Phoenix": [92] # needs 1
         }
 
 

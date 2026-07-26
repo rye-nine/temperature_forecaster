@@ -56,6 +56,13 @@ def residual_transform(day, city, variable="tmax"):
         residual_list.append(residual)
     return residual_list
 
+def create_df(): # this was literally just to suppress the warning of the incorrect feature names
+    X = pd.DataFrame({
+    "temperature": [75],
+    "humidity": [60],
+    "wind_speed": [10]
+    })
+    raise NotImplementedError
 
 def extrema_approximation_all(day, variable="tmax"): # after implementing get_prev_temps, will no longer need a prev_temps parameter
     approximation_list = []
@@ -73,9 +80,9 @@ def extrema_approximation_all(day, variable="tmax"): # after implementing get_pr
         transformed_day = day_transform(day, our_k_vals[city])
         transformed_residual = residual_transform(day, city, variable)
         fm_input = transformed_day if (isinstance(day, pd.Series)) else [transformed_day]
-        print(f"fm_input: {fm_input}")
+        #print(f"fm_input: {fm_input}")
         am_input = transformed_residual if (isinstance(day, pd.Series)) else [transformed_residual]
-        print(f"am_input: {am_input}")
+        #print(f"am_input: {am_input}")
         approximation = city_fourier_model.predict(fm_input)[0] +city_residual_model.predict(am_input)[0]
         approximation_list.append(approximation)
 
@@ -107,22 +114,23 @@ def get_final_residuals(variable="tmax"):
 
 t_max_df_with_residuals_list = get_final_residuals("tmax") # for get_all_std variable
 t_min_df_with_residuals_list = get_final_residuals("tmin")
-def get_all_std(day, day_range=15, variable="tmax"):
+def get_all_std(day, day_range=15, variable="tmax", city_target = None): # city_target not None only in evaluation.py
     if (isinstance(day, pd.Series)):
         days_list = list(day)
-        return [get_all_std(days_list[i], day_range, variable) for i in range(len(days_list))]
+        return [get_all_std(days_list[i], day_range, variable, city_target) for i in range(len(days_list))]
     city_names = list(weather_station_coords.keys())
     standard_deviation_list = []
     iterate_list = t_max_df_with_residuals_list if (variable == "tmax") else t_min_df_with_residuals_list
     for df_with_residuals, city in zip(iterate_list, city_names):
-        df_temp = df_with_residuals.copy()
+        if ((city_target is None) or (city == city_target)): 
+            df_temp = df_with_residuals.copy()
         
-        bool1 = df_temp["day_of_year"] >= day - day_range
-        bool2 = df_temp["day_of_year"] <= day + day_range
-        df_temp = df_temp[bool1 & bool2]
+            bool1 = df_temp["day_of_year"] >= day - day_range
+            bool2 = df_temp["day_of_year"] <= day + day_range
+            df_temp = df_temp[bool1 & bool2]
     
-        standard_deviation = df_temp["final_residuals"].std()
-        standard_deviation_list.append((city, standard_deviation))
+            standard_deviation = df_temp["final_residuals"].std()
+            standard_deviation_list.append((city, standard_deviation))
     return standard_deviation_list
 
 def normal_distribution_approximation(day, variable="tmax"):
