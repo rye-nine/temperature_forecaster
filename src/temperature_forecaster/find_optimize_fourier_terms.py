@@ -12,17 +12,18 @@ from temperature_forecaster.paths import DATA_RAW
 
 # ok i think you just need processed_data?
 
-def temp_load_data():
+def temp_load_data(city = None):
     loaded_data = []
     for location in weather_station_coords.keys():
-        df = pd.read_csv(DATA_RAW / f"{location}_weather_data.csv", index_col=0, parse_dates=True)
-        df["day_of_year"] = df.index.dayofyear
-        loaded_data.append(df)
+        if ((city is None) or (city == location)):
+            df = pd.read_csv(DATA_RAW / f"{location}_weather_data.csv", index_col=0, parse_dates=True)
+            df["day_of_year"] = df.index.dayofyear
+            loaded_data.append(df)
     return loaded_data
 
-def compute_heuristics(max_k=10, variable="tmax"):
+def compute_heuristics(max_k=10, variable="tmax", city_name = None):
     current_year = datetime.now().year
-    df_list = temp_load_data()
+    df_list = temp_load_data(city=city_name)
     chart_list = []
     heuristics_list = []
     for df_original in df_list:
@@ -95,12 +96,14 @@ def find_optimal_k_values(heuristics_list):
         k_values.append(heuristics_df[heuristics_df["test_MSE"] == min_val].iloc[0,0])
     return k_values
 
-def optimize_fourier_terms(max_k=10, variable="tmax"):
-    heuristics_list, chart_list = compute_heuristics(max_k, variable)
+def optimize_fourier_terms(max_k=10, variable="tmax", city = None):
+    heuristics_list, chart_list = compute_heuristics(max_k, variable, city)
     #display_charts(chart_list)
     optimal_k_values = find_optimal_k_values(heuristics_list)
     k_dict = {}
-    for i,key in enumerate(weather_station_coords):
-        k_dict[key] = optimal_k_values[i] 
-    print(f"Here is our FOURIER dictionary: {k_dict}")
+    for i,key in enumerate(weather_station_coords.keys()):
+        if ((city is None) or (city == key)):
+            k_dict[key] = optimal_k_values[i] if (city is None) else optimal_k_values[0]
+    print(f"Here is our FOURIER {variable} dictionary: {k_dict}")
     return k_dict
+

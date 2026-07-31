@@ -4,8 +4,8 @@ from temperature_forecaster.forecasting import run_forecasting
 from temperature_forecaster.fourier_features import engineer_and_store_data
 from temperature_forecaster.fourier_training import train_and_store_models
 from temperature_forecaster.residual_autocorrelation import train_and_store_autocorrelations
-from temperature_forecaster.__init__ import weather_station_coords, get_temperatures
-from temperature_forecaster.evaluation import vectorized_forecasting, calibrate_one_interval
+#from temperature_forecaster.__init__ import weather_station_coords, get_temperatures
+#from temperature_forecaster.evaluation import vectorized_forecasting, calibrate_one_interval
 #IMPORT CALIBRATE_ONE_INTERVAL
 
 #engineer_and_store_data(variable = "tmin")
@@ -16,7 +16,8 @@ from temperature_forecaster.evaluation import vectorized_forecasting, calibrate_
 #populate_charts(variable = "tmin", open_charts=True)
 #print(get_empirical_probability(196, "Miami", 84,100, variable = "tmax"))
 #print(get_probability(196, "Miami", 84, 100, variable = "tmax"))
-#run_forecasting(1, 196, 80,106, city="Miami", variable="tmax")
+
+print(run_forecasting(1, 196, 80,106, city="Miami", variable="tmax"))
 
 #engineer_and_store_data("tmax")
 #engineer_and_store_data("tmin")
@@ -24,4 +25,4 @@ from temperature_forecaster.evaluation import vectorized_forecasting, calibrate_
 #miami_coords = weather_station_coords["Miami"]
 #get_temperatures(miami_coords[0], miami_coords[1], 3, "tmax")
 
-print(calibrate_one_interval(1, 90,92, "Miami", "tmax").isna().sum())
+#print(calibrate_one_interval(1, 90,92, "Miami", "tmax").isna().sum())

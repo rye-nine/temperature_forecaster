@@ -1,6 +1,4 @@
 # to be used as API
-import random
-
 weather_station_coords = {
     "LA": (33.9425, -118.4081),
     "NYC": (40.7789, -73.9692),
@@ -12,47 +10,92 @@ weather_station_coords = {
     "Phoenix": (33.4342, -112.0116)
 }
 
-overriden_past_MAX_temps = {
-            "LA": [80, 77], # needs 2
-            "NYC": [79], # needs 1
-            "Chicago": [78, 74, 87], # needs 3
-            "Miami": [93], # needs 1
-            "Houston": [92, 102], # needs 2
-            "Austin": [98, 103], # needs 2
-            "Las Vegas": [111, 107], # needs 2
-            "Phoenix": [114, 107] # needs 2 
-        }
-overriden_past_MIN_temps = {
-            "LA": [68], # needs 1
-            "NYC": [64], # needs 1
-            "Chicago": [58, 60, 66, 65, 68, 70, 75], # needs 7
-            "Miami": [82], # needs 1
-            "Houston": [77, 80, 77], # needs 3
-            "Austin": [82, 78, 74, 74], # needs 4
-            "Las Vegas": [88, 86], # needs 2
-            "Phoenix": [92] # needs 1
-        }
-
 
 from datetime import datetime, timedelta
+import requests
 
-#from meteostat import Point, Daily
+# City definitions mapping to exact coordinates and primary ACIS station IDs (ICAO / GHCN)
+CITY_CONFIG = {
+    "LA": {"coords": (33.9425, -118.4081), "sid": "LAXthr"},
+    "NYC": {"coords": (40.7789, -73.9692), "sid": "NYCthr"},
+    "Chicago": {"coords": (41.7868, -87.7522), "sid": "ORDthr"},
+    "Miami": {"coords": (25.7959, -80.2870), "sid": "MIAthr"},
+    "Houston": {"coords": (29.6454, -95.2789), "sid": "IAHthr"},
+    "Austin": {"coords": (30.1945, -97.6699), "sid": "ATTthr"},
+    "Las Vegas": {"coords": (36.0801, -115.1522), "sid": "LASthr"},
+    "Phoenix": {"coords": (33.4342, -112.0116), "sid": "PHXthr"},
+}
 
-from datetime import date, timedelta
-import meteostat as ms
 
-def get_temperatures(latitude: float, longitude: float, num_days: int, variable = "tmax"):
-    end = date.today() - timedelta(days=1)  # Exclude today
-    start = end - timedelta(days=num_days - 1)
+def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
+    """Retrieves historical tmax or tmin data over the last 'n' days directly
 
-    point = ms.Point(latitude, longitude)
+    from the official NWS NOWData / ACIS climate station service.
 
-    stations = ms.stations.nearby(point, limit=4)
-    ts = ms.daily(stations, start, end)
-    df = ms.interpolate(ts, point).fetch()
+    Parameters:
+        city (str): Key matching CITY_CONFIG (e.g., "LA", "NYC").
+        n (int): Number of past days to retrieve data for.
+        stat_type (str): Either "tmax" or "tmin".
 
-    #df[variable] = df[variable] * 9 / 5 + 32
+    Returns:
+        list[float]: Daily temperatures in Â°F, ordered from most recent (index
+        0) to oldest.
+    """
+    # 1. Input validation
+    stat_type = stat_type.lower()
+    if stat_type not in ["tmax", "tmin"]:
+        raise ValueError("stat_type must be either 'tmax' or 'tmin'")
+    if n <= 0:
+        raise ValueError("n must be a positive integer")
+    if city not in CITY_CONFIG:
+        raise ValueError(
+            f"City '{city}' not found. Choose from: {list(CITY_CONFIG.keys())}"
+        )
 
-    #print(f"Data: {list(df[variable])}")
-    return [random.uniform(90,100) for i in range(num_days)]
+    # 2. Derive date range (Yesterday back to 'n' days ago)
+    today = datetime.now().date()
+    end_date = today - timedelta(days=1)
+    start_date = end_date - timedelta(days=n - 1)
+
+    station_id = CITY_CONFIG[city]["sid"]
+
+    # 3. Payload targeting ACIS StnData with explicit NWS Station Identifiers
+    payload = {
+        "sid": station_id,
+        "sdate": start_date.strftime("%Y-%m-%d"),
+        "edate": end_date.strftime("%Y-%m-%d"),
+        "elems": [{"name": "maxt" if stat_type == "tmax" else "mint"}],
+    }
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "Content-Type": "application/json",
+    }
+
+    url = "https://data.rcc-acis.org/StnData"
+    response = requests.post(url, json=payload, headers=headers, timeout=10)
+    response.raise_for_status()
+
+    data = response.json()
+
+    if "data" not in data or not data["data"]:
+        raise ValueError(
+            f"No climate data returned for {city} from ACIS service."
+        )
+
+    # 4. Extract temperatures from returned daily list [["YYYY-MM-DD", "value"], ...]
+    temperatures = []
+    for entry in data["data"]:
+        val = entry[1]
+        try:
+            temperatures.append(float(val))
+        except (ValueError, TypeError):
+            # Skip missing data flags (e.g., "M" for missing or "T" for trace)
+            continue
+
+    # 5. Reverse list so index 0 is most recent and last is oldest
+    temperatures.reverse()
+
+    return temperatures
+    
 

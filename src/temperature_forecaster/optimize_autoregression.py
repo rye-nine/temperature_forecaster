@@ -10,9 +10,11 @@ import numpy as np
 import pickle
 from temperature_forecaster.paths import PROJECT_ROOT
 
-def compute_heuristics(shift=10, variable="tmax"):
+
+
+def compute_heuristics(shift=10, variable="tmax", city = None):
     current_year = datetime.now().year
-    df_list = get_residual_list(variable)
+    df_list = get_residual_list(variable, city=city)
     chart_list = []
     heuristics_list = []
     for df_original in df_list:
@@ -70,44 +72,56 @@ def compute_heuristics(shift=10, variable="tmax"):
         # append to the chart_list
         chart_list.append(c1+c2)
         heuristics_list.append(df_heuristics)
-    return heuristics_list, chart_list
+    return heuristics_list, chart_list # heuristics list should only have one df if city is not None
 
 
+def get_html(city_name, variable, chart_bv_html, heuristics_chart_html):
+    html = f"""
+            <html> 
+    
+            <body>
+    
+            <h1>{city_name}_{variable} Bias-Variance Graph</h1>
+    
+            {chart_bv_html}
+    
+            <hr>
+    
+            <h2>Heuristics DataFrame</h2>
+    
+            {heuristics_chart_html}
+    
+            </body>
+    
+            </html>
+            """ 
+    return html
 
-def optimize_autoregressive_terms(max_shift = 10, variable = "tmax", only_charts = False):
-    heuristics_list, chart_list = compute_heuristics(max_shift, variable)
-    store_charts(chart_list,heuristics_list,variable)
+def store_charts(charts_lst, h_charts, variable = "tmax", city = None):
+    if (city is not None):
+        one_bv_chart = charts_lst[0]
+        one_h_chart = h_charts[0]
+        with open(PROJECT_ROOT / f"charts/bias_variance/{city}_{variable}.html", "w", encoding="utf-8") as g:
+            g.write(get_html(city_name=city, variable=variable, chart_bv_html=one_bv_chart.to_html(), heuristics_chart_html=one_h_chart.to_html()))
+        print(f"stored BV chart: {city}")
+        return
+    for bv_chart, city_name, heuristics_chart in zip(charts_lst, weather_station_coords.keys(), h_charts):
+        html_to_write = get_html(city_name=city_name, variable=variable, chart_bv_html=bv_chart.to_html(), heuristics_chart_html=heuristics_chart.to_html())
+        with open(PROJECT_ROOT / f"charts/bias_variance/{city_name}_{variable}.html", "w", encoding="utf-8") as f:
+            f.write(html_to_write)
+            print(f"stored BV chart: {city_name}")
+
+def optimize_autoregressive_terms(max_shift = 10, variable = "tmax", only_charts = False, city = None):
+    heuristics_list, chart_list = compute_heuristics(max_shift, variable, city = city)
+    store_charts(chart_list,heuristics_list,variable, city=city)
     if only_charts:
         return 
     optimal_shift_values = find_optimal_k_values(heuristics_list) # i know it's called k values but ignore it, it's shift values
     shift_dict = {}
-    for i,key in enumerate(weather_station_coords.keys()):
-        shift_dict[key] = optimal_shift_values[i] 
+    if (city is not None): # if city is specified
+        shift_dict[city] = optimal_shift_values[0]
+    else: # if city is None
+        for i,key in enumerate(weather_station_coords.keys()):
+            shift_dict[key] = optimal_shift_values[i] 
     print(f"this is our AUTOREGRESSION_{variable} dictionary: {shift_dict}")
     return shift_dict
-
-def store_charts(charts_lst, h_charts, variable = "tmax"):
-    for bv_chart, city_name, heuristics_chart in zip(charts_lst, weather_station_coords.keys(), h_charts):
-        html = f"""
-        <html> 
-
-        <body>
-
-        <h1>{city_name}_{variable} Bias-Variance Graph</h1>
-
-        {bv_chart.to_html()}
-
-        <hr>
-
-        <h2>Heuristics DataFrame</h2>
-
-        {heuristics_chart.to_html()}
-
-        </body>
-
-        </html>
-        """
-        with open(PROJECT_ROOT / f"charts/bias_variance/{city_name}_{variable}.html", "w", encoding="utf-8") as f:
-            print(f"stored BV chart: {city_name}")
-            f.write(html)
-    

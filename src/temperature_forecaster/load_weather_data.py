@@ -69,8 +69,10 @@ def load_df(location):
     
     return df
 
-def load_data():
-    for location in weather_station_coords.keys():
-        df = load_df(location)
-        df.to_csv(DATA_RAW / f"{location}_weather_data.csv")
-        print(f"[src/temperature_forecaster/load_weather_data.py]: Stored in data/raw: {location}_weather_data.csv")
+def load_data(city = None):
+        for location in weather_station_coords.keys():
+            if ((city is None) or (city == location)):
+                df = load_df(location)
+                df.to_csv(DATA_RAW / f"{location}_weather_data.csv")
+                print(f"Stored in data/raw: {location}_weather_data.csv")        
+

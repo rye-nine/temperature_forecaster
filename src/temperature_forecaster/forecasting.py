@@ -5,15 +5,15 @@ from scipy.stats import norm
 import pandas as pd
 
 def get_probability(day, city, minimum, maximum, variable="tmax"):
-    all_distributions = normal_distribution_approximation(day, variable)
 
-    city_distribution = all_distributions[city]
+    city_distribution = normal_distribution_approximation(day, variable, city)[city]
 
     mu = city_distribution[0]
     #print("mu: ", mu)
-    sigma = city_distribution[1]
+    print(type(mu))
+    sigma = city_distribution[1][1]
     #print("sigma: ", sigma)
-
+    print(type(sigma))
     probabilities = []
     for j in range(minimum, maximum-1, 2):
         lower = j
@@ -24,9 +24,8 @@ def get_probability(day, city, minimum, maximum, variable="tmax"):
 
 # testing
 def get_empirical_probability(day, city, minimum, maximum, variable = "tmax"):
-    df_with_residuals_list = get_final_residuals(variable)
-    city_index = list(weather_station_coords.keys()).index(city)
-    our_df = df_with_residuals_list[city_index]
+    df_with_residuals_list = get_final_residuals(variable, city=city) # because city is not default to None, this variable should just be a singleton list
+    our_df = df_with_residuals_list[0]
     # now we have our desired df based on city
     # now let's get the appropriate residuals
     day_offset = 15
@@ -36,8 +35,7 @@ def get_empirical_probability(day, city, minimum, maximum, variable = "tmax"):
     desired_residuals = list(good_df["final_residuals"])
 
     # just for getting the approximated extrema
-    all_distributions = normal_distribution_approximation(day, variable)
-    city_distribution = all_distributions[city]
+    city_distribution = normal_distribution_approximation(day, variable, city=city)[city]
     approximation = city_distribution[0]
 
     probabilities = []
@@ -52,8 +50,8 @@ def get_empirical_probability(day, city, minimum, maximum, variable = "tmax"):
 #mode = 1 --> normal distribution
 #mode = 2 --> empirical residual distribution
 def run_forecasting(mode,day, minimum, maximum, city=None, variable="tmax"):
-    city_names = list(weather_station_coords.keys())
     if (city is None): # no city is specified
+        city_names = list(weather_station_coords.keys())
         my_dict = {}
         for city in city_names:
             my_dict[city] = get_probability(day, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day, city, minimum, maximum, variable)
@@ -62,3 +60,4 @@ def run_forecasting(mode,day, minimum, maximum, city=None, variable="tmax"):
     probabs = get_probability(day, city, minimum, maximum, variable) if (mode == 1) else get_empirical_probability(day, city, minimum, maximum, variable)
     #print(f"Probabilities for {city}: {probabs}")
     return probabs
+
