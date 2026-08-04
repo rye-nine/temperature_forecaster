@@ -9,3 +9,4 @@ DATA_PROCESSED = PROJECT_ROOT / "data" / "processed"
 #models
 FOURIER_MODELS = PROJECT_ROOT / "models" /  "fourier_models"
 AUTOREGRESSION_MODELS = PROJECT_ROOT / "models" / "residual_autoregression_models"
+METADATA_FILE = PROJECT_ROOT / "data" / "cache" / "metadata.json"

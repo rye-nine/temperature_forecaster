@@ -39,7 +39,11 @@ from datetime import date
 import meteostat as ms # type: ignore
 from temperature_forecaster.__init__ import weather_station_coords
 from temperature_forecaster.find_optimize_fourier_terms import optimize_fourier_terms
-from temperature_forecaster.paths import DATA_RAW
+from temperature_forecaster.paths import DATA_RAW, METADATA_FILE
+from scripts.wipe_folder import wipe_folder
+import json
+from pathlib import Path
+import pickle
 
 
 def getCoords(locationName):
@@ -69,10 +73,46 @@ def load_df(location):
     
     return df
 
+def is_current(city, today_date_standard = date.today().isoformat()):
+    if city is None:
+        raise ValueError
+    CACHE_FILE = METADATA_FILE
+
+    with open(CACHE_FILE, "r") as f:
+        metadata = json.load(f)
+
+    last_updated = metadata[city]["RAW_DATA_last_updated"]
+
+    if last_updated == today_date_standard:
+        print(f"{city} is already up-to-date!")
+        return True
+    print(f"{city} raw data is old!")
+    return False
+
 def load_data(city = None):
+    if (city is None):
         for location in weather_station_coords.keys():
-            if ((city is None) or (city == location)):
-                df = load_df(location)
-                df.to_csv(DATA_RAW / f"{location}_weather_data.csv")
-                print(f"Stored in data/raw: {location}_weather_data.csv")        
+            load_data(location)
+
+    today = date.today()
+    today_day = today.timetuple().tm_yday
+    
+    if (is_current(city=city, today_date_standard = today.isoformat())):
+        print(f"Raw data for {city} already exists")
+        return
+    #else
+    wipe_folder("data", "raw", f"{city}_weather_data")
+    df = load_df(city)
+    df.to_csv(DATA_RAW / f"{city}_weather_data.csv")
+    print(f"Stored in data/raw: {city}_weather_data.csv")  
+
+    with open(METADATA_FILE, "r") as f:
+        metadata = json.load(f)
+
+    metadata["NYC"]["RAW_DATA_last_updated"] = date.today().isoformat()
+
+    with open(METADATA_FILE, "w") as g:
+        json.dump(metadata, g, indent=4)
+    return
+
 

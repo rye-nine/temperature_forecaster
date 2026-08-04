@@ -10,7 +10,6 @@ weather_station_coords = {
     "Phoenix": (33.4342, -112.0116)
 }
 
-
 from datetime import datetime, timedelta
 import requests
 
@@ -91,6 +90,7 @@ def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
             temperatures.append(float(val))
         except (ValueError, TypeError):
             # Skip missing data flags (e.g., "M" for missing or "T" for trace)
+            print("Skipping date due to missing value")
             continue
 
     # 5. Reverse list so index 0 is most recent and last is oldest

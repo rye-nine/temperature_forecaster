@@ -1,0 +1,26 @@
+{
+    "LA": {
+        "RAW_DATA_last_updated": null
+    },
+    "NYC": {
+        "RAW_DATA_last_updated": "2026-08-03"
+    },
+    "Chicago": {
+        "RAW_DATA_last_updated": null
+    },
+    "Miami": {
+        "RAW_DATA_last_updated": null
+    },
+    "Houston": {
+        "RAW_DATA_last_updated": null
+    },
+    "Austin": {
+        "RAW_DATA_last_updated": null
+    },
+    "Las Vegas": {
+        "RAW_DATA_last_updated": null
+    },
+    "Phoenix": {
+        "RAW_DATA_last_updated": null
+    }
+}
