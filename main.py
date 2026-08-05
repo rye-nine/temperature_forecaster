@@ -135,6 +135,9 @@ def pipeline_live(series_ticker, market_tickers):
     #return_thing = kalshi_forecasting(1,day_of_year, market_tickers, city=city_target, variable=target_variable)
     return_thing = kalshi_forecasting(MODE,day_of_year, market_tickers, city=city_target, variable=target_variable)
 
+    from temperature_forecaster.backtesting import backtest
+
+    print(backtest("2024-01-01", city = city_target, variable = target_variable))
     # wipe_folder("charts/diagnostics") 
     # wipe_folder("charts/bias_variance")
 
@@ -163,12 +166,12 @@ def collect_live_test(series_ticker="KXHIGHMIA"):
     print(result)
     return result
 
-def pipeline_live_test(series_ticker="kxhighny", market_tickers=["KXHIGHNY-26AUG01-T82", 
-  "KXHIGHNY-26AUG01-B82.5",
-  "KXHIGHNY-26AUG01-B84.5", 
-  "KXHIGHNY-26AUG01-B86.5", 
-  "KXHIGHNY-26AUG01-B88.5",
-  "KXHIGHNY-26AUG01-T89"]):
+def pipeline_live_test(series_ticker="kxhighlax", market_tickers=["KXHIGHLAX-26AUG04-T75", 
+  "KXHIGHLAX-26AUG04-B75.5",
+  "KXHIGHLAX-26AUG04-B77.5", 
+  "KXHIGHLAX-26AUG04-B79.5", 
+  "KXHIGHLAX-26AUG04-B81.5",
+  "KXHIGHLAX-26AUG04-T82"]):
     print(f"\n===== PIPELINE_LIVE TEST =====")
     result = pipeline_live(series_ticker, market_tickers)
     assert isinstance(result, dict)

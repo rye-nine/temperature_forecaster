@@ -109,7 +109,7 @@ def load_data(city = None):
     with open(METADATA_FILE, "r") as f:
         metadata = json.load(f)
 
-    metadata["NYC"]["RAW_DATA_last_updated"] = date.today().isoformat()
+    metadata[city]["RAW_DATA_last_updated"] = date.today().isoformat()
 
     with open(METADATA_FILE, "w") as g:
         json.dump(metadata, g, indent=4)
