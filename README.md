@@ -1,6 +1,6 @@
 **Extrema Temperature Forecaster**
 
-This climate forecasting device employs classical time series methods (coded from scratch) to predict the maximum and minimum temperatures on a given day across several locations, such as Los Angeles and New York City. Namely, Fourier regression and ARIMA are utilized to produce a Gaussian (normal) probability distribution and an empirical residual distribution that generates probabilities for each potential temperature range. This elementary forecaster was deployed on Kalshi markets on August 1st, 2026 at 6:20pm. Wish us luck! 
+This climate forecasting device employs classical time series methods (coded from scratch) to predict the maximum and minimum temperatures on a given day across several locations, such as Los Angeles and New York City. Namely, Fourier regression and autoregression are utilized to produce a Gaussian (normal) probability distribution and an empirical residual distribution that generates probabilities for each potential temperature range. This elementary forecaster was deployed on Kalshi markets on August 1st, 2026 at 6:20pm. Wish us luck! 
 
 This small project was developed for my friends’ “quant scheme” – a euphemism for an ambitious hedge fund that can almost be described as legitimate. We began with Kalshi’s climate markets to ease ourselves into the fields of quantitative modeling and risk management. This is practically one of the first projects I worked on whose timeline and structure resemble a (somewhat) professional DevOps model, so please bear with me. 
 
@@ -14,11 +14,11 @@ On a given day, it is wise to factor in the temperatures of the previous days wh
 
 **Extrema Predictions**
 
-On a given day, the estimated maximum/minimum temperature is calculated by transforming the numerical day of the year into the appropriate Fourier terms and the appropriate autoregressive terms. These terms are fed into the Fourier and ARIMA model, respectively, and the results are added to produce the final prediction. 
+On a given day, the estimated maximum/minimum temperature is calculated by transforming the numerical day of the year into the appropriate Fourier terms and the appropriate autoregressive terms. These terms are fed into the Fourier and autoregression model, respectively, and the results are added to produce the final prediction. 
 
 **Standard Deviation**
 
-To calculate the standard deviation of our prediction, we first apply the Fourier-ARIMA model to the city’s historical data and find the residuals. We then calculate the standard deviation of the residuals that are within 15 days of the given day of the year. 
+To calculate the standard deviation of our prediction, we first apply the Fourier-autoregression model to the city’s historical data and find the residuals. We then calculate the standard deviation of the residuals that are within 15 days of the given day of the year. 
 
 **Which Distribution?**
 
@@ -26,7 +26,9 @@ This was arguably the most difficult design-related aspect of this project. Whil
 
 **Graphs and Charts**
 
-Each city is associated with two HTML files: diagnostics and bias-variance charts. Each bias-variance chart includes a graph of training and testing MSE used to optimize the ARIMA terms as well as the corresponding DataFrame. Each diagnostics file includes a time series graph consisting of actual maximum/minimum temperatures, the predicted maximum/minimum temperatures, and the residuals, as well as a residual histogram and a Q-Q plot that investigate normality.
+Each city is associated with two HTML files: diagnostics and bias-variance charts. Each bias-variance chart includes a graph of training and testing MSE used to optimize the autoregressive terms as well as the corresponding DataFrame. Each diagnostics file includes a time series graph consisting of actual maximum/minimum temperatures, the predicted maximum/minimum temperatures, and the residuals, as well as a residual histogram and a Q-Q plot that investigate normality.
 
+**Backtesting and Calibration**
 
+Backtesting is conducted using walk-forward expanding window validation (resource: https://medium.com/data-science/putting-your-forecasting-model-to-the-test-a-guide-to-backtesting-24567d377fb5) and is used to calculate the MSE of our predictions if we started on a previous day (defaulted to January 1st, 2024). Calibration is implemented by verifying that the given probabilities of each temperature range matches with historical probabilities of that same temperature range. Calibration is only employed to assess the validity of predictions made under a normal distribution. Calibration is trivial under an empirical residual distribution. Calibration was a bit of a tricky step. It was relatively easy to implement, but a nightmare to optimize. It used to have a runtime of around 45 minutes, but I was able to reduce it to mere milliseconds using vectorization. Thank goodness! 
 
