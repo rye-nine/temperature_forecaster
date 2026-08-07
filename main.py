@@ -1,4 +1,5 @@
 """
+THIS WAS FORKED FROM JOSH KIM'S INFRASTRUCTURE WITH PERMISSION
 This is a sample strategy.py file. Edit it to fit your strategy!
 
 In order to run your tests, open the terminal in this directory and run "python3 -i strategy.py"
@@ -82,7 +83,7 @@ def collect_live(series_ticker):
         raise ValueError
 
     variable = "tmax" if ("high" in series_ticker or "HIGH" in series_ticker) else "tmin"
-    #wipe_folder("data")
+
     from temperature_forecaster.load_weather_data import load_data
     load_data(target_city)
     from temperature_forecaster.fourier_features import engineer_and_store_data
@@ -137,12 +138,17 @@ def pipeline_live(series_ticker, market_tickers):
 
     from temperature_forecaster.backtesting import backtest
 
-    print(backtest("2024-01-01", city = city_target, variable = target_variable))
+    backtest("2024-01-01", city = city_target, variable = target_variable)
     # wipe_folder("charts/diagnostics") 
     # wipe_folder("charts/bias_variance")
 
-    # from src.exploration import populate_charts
-    # populate_charts(target_variable, open_charts=True, city=city_target)
+    from temperature_forecaster.evaluation import calibrate
+
+    calibrate(77,79, city_name = city_target, variable_name = target_variable)
+    
+    
+    from temperature_forecaster.exploration import populate_charts
+    populate_charts(target_variable, open_charts=True, city=city_target)
 
     return return_thing
 

@@ -118,11 +118,12 @@ def find_std(df, day, day_range):
     return standard_deviation
 
 # I KNOW IT HAS THE WORD "ALL" BUT JUST BARE WITH ME PLEASE
-def get_all_std(day, day_range=15, variable="tmax", city_name = None):
+def get_all_std(day, day_range=15, variable="tmax", city_name = None, residual_list=None):
     if (isinstance(day, pd.Series)):
         days_list = list(day)
-        return [get_all_std(days_list[i], day_range, variable, city_target) for i in range(len(days_list))]
-    df_with_residuals_list = get_final_residuals(variable, city=city_name)
+        temp_df_with_residuals_list = get_final_residuals(variable, city=city_name)
+        return [get_all_std(days_list[i], day_range, variable, city_name, temp_df_with_residuals_list) for i in range(len(days_list))]
+    df_with_residuals_list = residual_list if (residual_list is not None) else get_final_residuals(variable, city=city_name)
     standard_deviation_list = []
     if (city_name is not None):
         standard_deviation_list.append((city_name, find_std(df_with_residuals_list[0], day, day_range)))

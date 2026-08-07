@@ -1,6 +1,6 @@
 {
     "LA": {
-        "RAW_DATA_last_updated": "2026-08-04"
+        "RAW_DATA_last_updated": "2026-08-06"
     },
     "NYC": {
         "RAW_DATA_last_updated": "2026-08-04"
@@ -9,7 +9,7 @@
         "RAW_DATA_last_updated": null
     },
     "Miami": {
-        "RAW_DATA_last_updated": null
+        "RAW_DATA_last_updated": "2026-08-06"
     },
     "Houston": {
         "RAW_DATA_last_updated": null

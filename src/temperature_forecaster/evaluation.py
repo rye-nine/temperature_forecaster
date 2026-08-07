@@ -4,22 +4,31 @@
 # spanning the historical data.
 
 from temperature_forecaster.forecasting import run_forecasting
-from temperature_forecaster.fourier_features import load_data
+from temperature_forecaster.fourier_features import load_raw_data
 from temperature_forecaster.__init__ import weather_station_coords
-from temperature_forecaster.residual_autocorrelation import optimal_ar_terms, tmin_optimal_ar_terms
+#from temperature_forecaster.residual_autocorrelation import optimal_ar_terms, tmin_optimal_ar_terms
 from temperature_forecaster.fourier_training import load_models
 from temperature_forecaster.probability_model import load_residual_models, get_final_residuals, get_all_std
+from temperature_forecaster.optimize_autoregression import optimize_autoregressive_terms
 # get_final_residuals is a function that returns a list of 
 # dataframes that has all of the features and the final predictions
 # and residuals
 
 import pandas as pd 
 import numpy as np
+from scipy.stats import norm
 
-def form_data(variable = "tmax"):
-    raw_data = load_data()
+# calibration only works when using normal distribution
+
+def form_data(variable = "tmax", city = None):
+    raw_data = load_raw_data(city=city)
     return_list = []
-    opt_shift_values = optimal_ar_terms if (variable == "tmax") else tmin_optimal_ar_terms
+    opt_shift_values = optimize_autoregressive_terms(10, city=city, variable=variable)
+    if (city is not None):
+        df_one = raw_data[0].copy()
+        lag = int(opt_shift_values[city])
+        for i in range(1,lag + 1):
+            df_one[f"lag_{i}"] = df_one[variable].shift(j)
     for df, city in zip(raw_data, weather_station_coords.keys()):
         df_copy = df.copy()
         df_copy = df_copy[[variable, "day_of_year"]]
@@ -31,7 +40,7 @@ def form_data(variable = "tmax"):
     return return_list
 
 def vectorized_std(days_series, city, variable_name = "tmax"): # intakes a pd.Series
-    return_thing = get_all_std(days_series, variable = variable_name, city_target = city)
+    return_thing = get_all_std(days_series, variable = variable_name, city_name = city)
     print([lst[0][1] for lst in return_thing])
     return [lst[0][1] for lst in return_thing]
 
@@ -40,14 +49,14 @@ def vectorized_forecasting(mode, day_col, MIN, MAX, city, variable = "tmax"):
     # predict the temperature and generate a probability distribution in accordance to @mode
     # then we just find the probability between MIN and MAX (recall that MAX = MIN + 2)
     # this will typically use mode = 1 (use normal distribution) 
-    all_city_fourier_models = load_models(variable)
-    all_city_AR_models = load_residual_models(variable)
-    residual_dfs = get_final_residuals(variable) # get both fourier features and AR features
+    #all_city_fourier_models = load_models(variable)
+    #all_city_AR_models = load_residual_models(variable)
+    residual_dfs = get_final_residuals(variable, city=city) # get both fourier features and AR features
 
-    city_index = list(weather_station_coords.keys()).index(city)
-    city_fm = all_city_fourier_models[city_index]
-    city_am = all_city_AR_models[city_index]
-    city_residual_df = residual_dfs[city_index]
+    #city_index = list(weather_station_coords.keys()).index(city)
+    #city_fm = all_city_fourier_models[city_index]
+    #city_am = all_city_AR_models[city_index]
+    city_residual_df = residual_dfs[0]
 
     df = city_residual_df.copy()
     df["std_devs"] = vectorized_std(day_col, city, variable)
@@ -61,10 +70,10 @@ def vectorized_forecasting(mode, day_col, MIN, MAX, city, variable = "tmax"):
 def calibrate_one_interval(mode, MIN, MAX, city_name, variable_name = "tmax"):
     # MAX = MIN + 2
     city_index = list(weather_station_coords.keys()).index(city_name)
-    df_list = form_data()
+    df_list = get_final_residuals(city=city_name)
     
-    df = df_list[city_index]
-    df[f"[{MIN}, {MAX}]-probability"] = vectorized_forecasting(1, df["day_of_year"], MIN, MAX, city_name, variable_name) 
+    df = df_list[0]
+    df["tuples(ignore)"] = vectorized_forecasting(1, df["day_of_year"], MIN, MAX, city_name, variable_name) 
     # df.apply(
     #     lambda row: run_forecasting(
     #         mode,
@@ -76,6 +85,13 @@ def calibrate_one_interval(mode, MIN, MAX, city_name, variable_name = "tmax"):
     #     )[0][1],
     #     axis = 1
     #)
+
+        
+    mu_list = df["tuples(ignore)"].str[0].tolist()
+    std_list = df["tuples(ignore)"].str[1].tolist()
+
+    df[f"[{MIN}, {MAX}]-probability"] = norm.cdf(MAX, loc=mu_list, scale=std_list) - norm.cdf(MIN, loc=mu_list, scale=std_list)
+
 
     df["outcome"] = (
     (MIN <= df[variable_name]) &
@@ -107,4 +123,7 @@ def form_groups(mode, minimum, maximum, city_name, variable_name = "tmax"):
         return_dict[(i, i + 0.1)] = observed_positive / num_rows
     return return_dict
 
-# def calibrate(min_temp, max_temp, city_name, lag= 3, variable_name="tmax"):
+def calibrate(min_temp, max_temp, city_name, variable_name="tmax"):
+    return_thing = form_groups(mode=1, minimum=min_temp, maximum=max_temp, city_name=city_name, variable_name=variable_name)
+    print(return_thing)
+    return return_thing
