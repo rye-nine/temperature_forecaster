@@ -10,7 +10,7 @@ weather_station_coords = {
     "Phoenix": (33.4342, -112.0116)
 }
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import requests
 
 # City definitions mapping to exact coordinates and primary ACIS station IDs (ICAO / GHCN)
@@ -98,4 +98,29 @@ def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
 
     return temperatures
     
+month_map = {
+    "JAN": 1,
+    "FEB": 2,
+    "MAR": 3,
+    "APR": 4,
+    "MAY": 5,
+    "JUN": 6,
+    "JUL": 7,
+    "AUG": 8,
+    "SEP": 9,
+    "OCT": 10,
+    "NOV": 11,
+    "DEC": 12
+}
+
+def get_day(market_ticker: str) -> int:
+    split_ticker = market_ticker.split("-")
+    str_date = split_ticker[1]
+    year = 2000 + int(str_date[:2])
+    month = month_map[str_date[2:5]]
+    day = int(str_date[-2:])
+    datetime_object = date(year, month, day)
+    return datetime_object.timetuple().tm_yday  
+
+
 

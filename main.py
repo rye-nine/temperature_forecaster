@@ -14,7 +14,7 @@ import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from temperature_forecaster.__init__ import weather_station_coords
+from temperature_forecaster.__init__ import weather_station_coords, get_day
 from scripts.wipe_folder import wipe_folder
 
 # ✅
@@ -123,8 +123,10 @@ def pipeline_live(series_ticker, market_tickers):
     # use normal distribution in fall and spring
     # use empirical residual distribution in summer and winter because there may be extreme values
 
-    today = datetime.now(ZoneInfo("America/Los_Angeles")).date()
-    day_of_year = today.timetuple().tm_yday
+    #today = datetime.now(ZoneInfo("America/Los_Angeles")).date()
+    #day_of_year = today.timetuple().tm_yday
+
+    day_of_year = get_day(market_tickers[0])
     #from src.forecasting import appropriate_intervals, sliced_intervals
     #print(sliced_intervals(market_tickers))
     #return
