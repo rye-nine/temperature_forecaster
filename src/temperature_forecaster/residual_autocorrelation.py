@@ -11,7 +11,7 @@ from temperature_forecaster.fourier_training import get_residual_list
 
 # HELPER FUNCTION, IGNORE IN PIPELINE
 def lag_df(df, lag):
-    for j in range(1, int(lag) + 1):
+    for j in range(2, int(lag) + 2): # changed lag_df so that we get the lags from 1 to n+1 
         df[f"residual_lag{j}"] = df["residuals"].shift(j)
     df = df.dropna(axis = 0)
     return df

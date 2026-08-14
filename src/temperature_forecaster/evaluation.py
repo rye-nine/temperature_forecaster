@@ -27,13 +27,13 @@ def form_data(variable = "tmax", city = None):
     if (city is not None):
         df_one = raw_data[0].copy()
         lag = int(opt_shift_values[city])
-        for i in range(1,lag + 1):
+        for i in range(2,lag + 2): # changed to 2, lag + 2
             df_one[f"lag_{i}"] = df_one[variable].shift(j)
     for df, city in zip(raw_data, weather_station_coords.keys()):
         df_copy = df.copy()
         df_copy = df_copy[[variable, "day_of_year"]]
         lag = int(opt_shift_values[city])
-        for j in range(1, lag+1):
+        for j in range(2, lag+2): # changed to 2, lag + 2
             df_copy[f"lag_{j}"] = df_copy["tmax"].shift(j)
         df_copy = df_copy.dropna(axis = 0)
         return_list.append(df_copy)

@@ -27,7 +27,7 @@ def compute_heuristics(shift=10, variable="tmax", city = None):
         # have no missing values (if they did, they were intrapolated)
 
         # feature engineering to add the fourier coefficients
-        for i in range(1, shift + 1):
+        for i in range(2, shift + 2): # changed to 2, shift + 2
             df_iterate[f"residual_lag{i}"] = df_iterate["residuals"].shift(i)
 
         df_iterate = df_iterate.dropna(axis = 0)

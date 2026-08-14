@@ -51,9 +51,9 @@ def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
             f"City '{city}' not found. Choose from: {list(CITY_CONFIG.keys())}"
         )
 
-    # 2. Derive date range (Yesterday back to 'n' days ago)
+    # 2. Derive date range (2 days ago back to 'n+1' days ago)
     today = datetime.now().date()
-    end_date = today - timedelta(days=1)
+    end_date = today - timedelta(days=2)
     start_date = end_date - timedelta(days=n - 1)
 
     station_id = CITY_CONFIG[city]["sid"]
@@ -97,6 +97,7 @@ def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
     temperatures.reverse()
 
     return temperatures
+
     
 month_map = {
     "JAN": 1,

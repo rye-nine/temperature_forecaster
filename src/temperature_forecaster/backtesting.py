@@ -34,7 +34,7 @@ def get_calibration_df(start_date, city, variable = "tmax"):
         
         # now we lag
 
-        for i in range(1, int(optimal_residual_lag)+1):
+        for i in range(2, int(optimal_residual_lag)+2): # changed to 2, int(...) + 2
             iterate_df[f"fourier_residual_lag{i}"] = iterate_df["fourier_residuals"].shift(i)
         iterate_df = iterate_df.dropna(axis = 0)
         
@@ -57,10 +57,10 @@ def get_calibration_df(start_date, city, variable = "tmax"):
         # now transform the residuals
         prev_temps = list(growing_training_set.tail(int(optimal_residual_lag))[variable])
         residual_list = []
-        for i in range(1, len(prev_temps) + 1):
+        for i in range(2, len(prev_temps) + 2):
             date_to_use = desired_day - i
             temp_transformed_day = day_transform(date_to_use, num_fourier_terms)
-            residual = prev_temps[len(prev_temps)-i] - fourier_model.predict([temp_transformed_day])[0] # this prev_temps is reverse, so we need to use prev_temps[len(prev_temps) - i]
+            residual = prev_temps[len(prev_temps)-(i-1)] - fourier_model.predict([temp_transformed_day])[0] # this prev_temps is reverse, so we need to use prev_temps[len(prev_temps) - i]
             residual_list.append(residual)
 
         final_prediction = fourier_model.predict([transformed_day])[0] + AR_model.predict([residual_list])[0]

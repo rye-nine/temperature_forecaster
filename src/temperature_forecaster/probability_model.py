@@ -41,10 +41,10 @@ def residual_transform(prev_temps,day, city, variable="tmax"):
     fourier_model = load_models(variable, city = city)[0]
     k_val = optimize_fourier_terms(10, variable=variable, city=city)[city]
     residual_list = []
-    for i in range(1, len(prev_temps) + 1):
+    for i in range(2, len(prev_temps) + 2): # changed to 2, len(prev_temps) + 2
         target_day = day - i
         transformed_day = day_transform(target_day, k_val)
-        residual = prev_temps[i-1] - fourier_model.predict([transformed_day])[0]
+        residual = prev_temps[i-2] - fourier_model.predict([transformed_day])[0]
         residual_list.append(residual)
     return residual_list
 
