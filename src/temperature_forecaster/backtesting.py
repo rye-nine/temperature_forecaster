@@ -85,7 +85,7 @@ def run_calculations(df):
 
 def backtest(start_date, city, variable = "tmax"):
     calculations = run_calculations(get_calibration_df(start_date=start_date, city=city, variable=variable))
-    print(calculations)
+    print(f"MSE: {calculations}")
     return calculations     
 
 
