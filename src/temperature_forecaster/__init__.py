@@ -26,7 +26,7 @@ CITY_CONFIG = {
 }
 
 
-def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
+def get_wrh_climate_temp(city: str, n: int, stat_type: str, day: int) -> list[float]:
     """Retrieves historical tmax or tmin data over the last 'n' days directly
 
     from the official NWS NOWData / ACIS climate station service.
@@ -53,7 +53,10 @@ def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
 
     # 2. Derive date range (Yesterday back to 'n' days ago)
     today = datetime.now().date()
-    end_date = today - timedelta(days=1)
+
+    target_date = date(today.year, 1, 1) + timedelta(days=day - 1)
+
+    end_date = target_date - timedelta(days=1)
     start_date = end_date - timedelta(days=n - 1)
 
     station_id = CITY_CONFIG[city]["sid"]
@@ -95,7 +98,8 @@ def get_wrh_climate_temp(city: str, n: int, stat_type: str) -> list[float]:
 
     # 5. Reverse list so index 0 is most recent and last is oldest
     temperatures.reverse()
-
+    
+    print(f"TEMPERATURES: {temperatures}")
     return temperatures
     
 month_map = {

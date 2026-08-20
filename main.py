@@ -126,7 +126,7 @@ def pipeline_live(series_ticker, market_tickers):
     #today = datetime.now(ZoneInfo("America/Los_Angeles")).date()
     #day_of_year = today.timetuple().tm_yday
 
-    day_of_year = get_day(market_tickers[0])
+    day_of_year = 233#get_day(market_tickers[0])
     #from src.forecasting import appropriate_intervals, sliced_intervals
     #print(sliced_intervals(market_tickers))
     #return

@@ -50,29 +50,42 @@ def residual_transform(prev_temps,day, city, variable="tmax"):
 
 # take note, this function isnt that important to implement city = None because it's low computation time
 # helper function, this is the only function that uses the get_temperatures function from __init__.py
-def get_prev_temps(variable = "tmax", city = None): # override should be fixed in the future, but rn it's false cuz im just using random numbers haha
+def get_prev_temps(day: int, variable = "tmax", city = None): # override should be fixed in the future, but rn it's false cuz im just using random numbers haha
     optimal_ar = optimize_autoregressive_terms(10, variable=variable, city=city)
     # the idea is that we'll return a dictionary of each city and their prev temps in accordance to optimal ar terms
     prev_temps_dict = {}
     if (city is not None): # equivalent to if optimal_ar has only one value
-        prev_temps_dict[city] = get_wrh_climate_temp(city, int(optimal_ar[city]), stat_type=variable)
+        prev_temps_dict[city] = get_wrh_climate_temp(city, int(optimal_ar[city]), variable,day)
         return prev_temps_dict
     for city_name, optimal_terms in zip(weather_station_coords.keys(), optimal_ar.values()):
-        prev_temps_dict[city_name] = get_wrh_climate_temp(city_name, int(optimal_terms), stat_type=variable)
+        prev_temps_dict[city_name] = get_wrh_climate_temp(city_name, int(optimal_terms), variable, day)
     return prev_temps_dict
+    
+def modified_get_prev_temps(day: int, variable = "tmax", city = None): # to be used when getting the next day's max/min temp at 12am
+    # so the idea is that we're going to use the approximation for the current day as a previous temp
+    approximated_prev_temp = extrema_approximation_all(day-1, variable, city_name = city, one_day_ahead = False) # a singleton set btw
+    raw_prev_temps = get_prev_temps(day-1, variable,city)[city]
+    return_dict = {}
+    return_dict[city] = approximated_prev_temp + raw_prev_temps[:-1] # union the two sets 
+    return return_dict
+
 
 # OK LOOK I KNOW IT HAS THE WORD "ALL" IN IT BUT PLEASE JUST BEAR WITH ME
-def extrema_approximation_all(day, variable="tmax", city_name = None): # after implementing get_prev_temps, will no longer need a prev_temps parameter
+def extrema_approximation_all(day, variable="tmax", city_name = None, one_day_ahead = True): # after implementing get_prev_temps, will no longer need a prev_temps parameter
     approximation_list = []
     fourier_model = load_models(variable, city=city_name)
     residual_model = load_residual_models(variable, city=city_name)
-    dict_prev_temps = get_prev_temps(variable, city=city_name)
+
+    #best_ar_values = optimize_autoregressive_terms(10,variable=variable, city=city)
+
+    dict_prev_temps = get_prev_temps(day,variable, city=city_name) if (not one_day_ahead) else modified_get_prev_temps(day, variable, city_name) # if one_day_ahead == True
+    print(f"one_day_ahead: {one_day_ahead}")
 
     our_k_vals = optimize_fourier_terms(10, variable=variable, city=city_name)
 
     for city in weather_station_coords.keys():
         if ((city_name is None) or (city_name == city)):
-            index = list(weather_station_coords.keys()).index(city) if city_name is None else 0 
+            index = list(weather_station_coords.keys()).index(city) if (city_name is None) else 0 
             city_fourier_model = fourier_model[index]
             city_residual_model = residual_model[index]
             
@@ -82,6 +95,11 @@ def extrema_approximation_all(day, variable="tmax", city_name = None): # after i
             if (city_name == city):
                 return approximation_list # so should just be a singleton set if city_name is None
     return approximation_list
+
+
+def modified_extrema_approximation(day, variable = "tmax", city_name = None):
+    # edit get_wrh_climate_temp to accept a parameter that takes the day of year
+    return
 
 # investigate this function
 def get_final_residuals(variable="tmax", city = None):
