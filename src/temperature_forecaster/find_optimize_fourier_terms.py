@@ -21,11 +21,16 @@ def temp_load_data(city = None):
             loaded_data.append(df)
     return loaded_data
 
-def compute_heuristics(max_k=10, variable="tmax", city_name = None):
+def compute_heuristics(max_k=10, variable="tmax", city_name = None, var_df = None): # added var_df parameter to override df to be optimized
     current_year = datetime.now().year
-    df_list = temp_load_data(city=city_name)
+    df_list = temp_load_data(city=city_name) if (var_df is None) else [var_df] # if var_df is not None
     chart_list = []
     heuristics_list = []
+
+    if (var_df is not None):
+        latest_year_in_var_df = var_df.index.year.max()
+        var_df_test = var_df[var_df.index.year == latest_year_in_var_df]
+
     for df_original in df_list:
 
         df_iterate = df_original.copy()
@@ -43,8 +48,8 @@ def compute_heuristics(max_k=10, variable="tmax", city_name = None):
         cols = list(df_iterate.columns[df_iterate.columns.str.contains("Fsin|Fcos")])
 
         # divide into training and testing df, also make the heuristics df
-        df_train = df_iterate[df_iterate.index < f"{current_year}-01-01"] # train 
-        df_test = df_iterate[df_iterate.index >= f"{current_year}-01-01"] # test
+        df_train = df_iterate[df_iterate.index < f"{current_year}-01-01"] if (var_df is None) else df_iterate[df_iterate.index.year < latest_year_in_var_df] # train 
+        df_test = df_iterate[df_iterate.index >= f"{current_year}-01-01"] if (var_df is None) else var_df_test # test
         df_heuristics = pd.DataFrame(columns = ["k-value", "train_MSE", "test_MSE"])
         
         # fill out the heuristics df 
@@ -96,14 +101,15 @@ def find_optimal_k_values(heuristics_list):
         k_values.append(heuristics_df[heuristics_df["test_MSE"] == min_val].iloc[0,0])
     return k_values
 
-def optimize_fourier_terms(max_k=10, variable="tmax", city = None):
-    heuristics_list, chart_list = compute_heuristics(max_k, variable, city)
+def optimize_fourier_terms(max_k=10, variable="tmax", city = None, var_df = None):
+    heuristics_list, chart_list = compute_heuristics(max_k, variable, city, var_df=var_df)
     #display_charts(chart_list)
     optimal_k_values = find_optimal_k_values(heuristics_list)
     k_dict = {}
     for i,key in enumerate(weather_station_coords.keys()):
         if ((city is None) or (city == key)):
             k_dict[key] = optimal_k_values[i] if (city is None) else optimal_k_values[0]
-    print(f"Here is our FOURIER {variable} dictionary: {k_dict}")
+    print_statement = f"Here is our FOURIER {variable} dictionary: {k_dict}" if (var_df is None) else f"Here is our VAR_DF FOURIER {variable} dictionary: {k_dict}" 
+    print(print_statement)
     return k_dict
 
