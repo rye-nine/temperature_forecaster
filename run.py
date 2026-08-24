@@ -8,6 +8,7 @@ from temperature_forecaster.backtesting import get_calibration_df
 from temperature_forecaster.evaluation import calibrate_one_interval
 from temperature_forecaster.load_weather_data import load_data
 from temperature_forecaster.__init__ import get_day
+from temperature_forecaster.find_optimize_fourier_terms import alternate_compute_heuristics, alternate_find_optimal_k_values
 #from temperature_forecaster.__init__ import weather_station_coords, get_temperatures
 #from temperature_forecaster.evaluation import vectorized_forecasting, calibrate_one_interval
 #IMPORT CALIBRATE_ONE_INTERVAL
@@ -38,4 +39,6 @@ from temperature_forecaster.__init__ import get_day
 #)
 #print(df)
 
-print(get_day("KXHIGHLAX-26AUG04-T75"))
+#print(get_day("KXHIGHLAX-26AUG04-T75"))
+df_list = alternate_compute_heuristics(city_name = "Miami")
+print(alternate_find_optimal_k_values(df_list))

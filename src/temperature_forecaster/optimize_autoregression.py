@@ -12,11 +12,16 @@ from temperature_forecaster.paths import PROJECT_ROOT
 
 
 
-def compute_heuristics(shift=10, variable="tmax", city = None):
+def compute_heuristics(shift=10, variable="tmax", city = None, var_df = None):
     current_year = datetime.now().year
-    df_list = get_residual_list(variable, city=city)
+    df_list = get_residual_list(variable, city=city) if (var_df is None) else [var_df]
     chart_list = []
     heuristics_list = []
+
+    if (var_df is not None):
+        latest_year_in_var_df = var_df.index.year.max()
+        var_df_test = var_df[var_df.index.year == latest_year_in_var_df]
+
     for df_original in df_list:
 
         df_iterate = df_original.copy()
@@ -29,14 +34,15 @@ def compute_heuristics(shift=10, variable="tmax", city = None):
         # feature engineering to add the fourier coefficients
         for i in range(1, shift + 1):
             df_iterate[f"residual_lag{i}"] = df_iterate["residuals"].shift(i)
-
+        
         df_iterate = df_iterate.dropna(axis = 0)
         
         cols = list(df_iterate.columns[df_iterate.columns.str.contains("residual_lag")])
 
         # divide into training and testing df, also make the heuristics df
-        df_train = df_iterate[df_iterate.index < f"{current_year}-01-01"] # train 
-        df_test = df_iterate[df_iterate.index >= f"{current_year}-01-01"] # test
+        df_train = df_iterate[df_iterate.index < f"{current_year}-01-01"] if (var_df is None) else df_iterate[df_iterate.index.year < latest_year_in_var_df] # train 
+        df_test = df_iterate[df_iterate.index >= f"{current_year}-01-01"] if (var_df is None) else var_df_test # test
+
         df_heuristics = pd.DataFrame(columns = ["shift_amount", "train_MSE", "test_MSE"])
         
         # fill out the heuristics df 
@@ -111,8 +117,8 @@ def store_charts(charts_lst, h_charts, variable = "tmax", city = None):
             f.write(html_to_write)
             print(f"stored BV chart: {city_name}")
 
-def optimize_autoregressive_terms(max_shift = 10, variable = "tmax", only_charts = False, city = None):
-    heuristics_list, chart_list = compute_heuristics(max_shift, variable, city = city)
+def optimize_autoregressive_terms(max_shift = 10, variable = "tmax", only_charts = False, city = None, var_df = None):
+    heuristics_list, chart_list = compute_heuristics(max_shift, variable, city = city, var_df=var_df)
     store_charts(chart_list,heuristics_list,variable, city=city)
     if only_charts:
         return 
@@ -123,5 +129,6 @@ def optimize_autoregressive_terms(max_shift = 10, variable = "tmax", only_charts
     else: # if city is None
         for i,key in enumerate(weather_station_coords.keys()):
             shift_dict[key] = optimal_shift_values[i] 
-    print(f"this is our AUTOREGRESSION_{variable} dictionary: {shift_dict}")
+    print_statement = f"Here is our AUTOREGRESSION {variable} dictionary: {shift_dict}" if (var_df is None) else f"Here is our VAR_DF AUTOREGRESSION {variable} dictionary: {shift_dict}" 
+    print(print_statement)
     return shift_dict

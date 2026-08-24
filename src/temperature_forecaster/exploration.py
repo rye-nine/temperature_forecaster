@@ -15,6 +15,7 @@ from temperature_forecaster.__init__ import weather_station_coords
 from temperature_forecaster.paths import PROJECT_ROOT
 
 def get_ts(df_list, variable = "tmax"): # from now on, df_list is a singleton set
+    temp_thing = df_list[0]
     city_df = df_list[0]
 
     set_width = 1500

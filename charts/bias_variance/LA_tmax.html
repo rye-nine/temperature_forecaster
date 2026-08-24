@@ -28,7 +28,7 @@
   <div id="vis"></div>
   <script>
     (function(vegaEmbed) {
-      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "layer": [{"data": {"name": "data-a61917573d750c9b9085fa7a3ab79eec"}, "mark": {"type": "line", "color": "red"}, "encoding": {"x": {"field": "shift_amount", "type": "quantitative"}, "y": {"field": "train_MSE", "type": "quantitative"}}}, {"data": {"name": "data-a61917573d750c9b9085fa7a3ab79eec"}, "mark": {"type": "line", "color": "blue"}, "encoding": {"x": {"field": "shift_amount", "type": "quantitative"}, "y": {"field": "test_MSE", "type": "quantitative"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json", "datasets": {"data-a61917573d750c9b9085fa7a3ab79eec": [{"shift_amount": 1.0, "train_MSE": 36.97699905678813, "test_MSE": 28.401606636055416}, {"shift_amount": 2.0, "train_MSE": 36.67719077295639, "test_MSE": 27.58111633670028}, {"shift_amount": 3.0, "train_MSE": 36.61973561859883, "test_MSE": 27.608619312592744}, {"shift_amount": 4.0, "train_MSE": 36.6026640661183, "test_MSE": 27.658552544338715}, {"shift_amount": 5.0, "train_MSE": 36.56941844695669, "test_MSE": 27.90402274778944}, {"shift_amount": 6.0, "train_MSE": 36.561723514586625, "test_MSE": 28.05944609004364}, {"shift_amount": 7.0, "train_MSE": 36.527551640172476, "test_MSE": 28.377313436131974}, {"shift_amount": 8.0, "train_MSE": 36.518648588717994, "test_MSE": 28.48192866048149}, {"shift_amount": 9.0, "train_MSE": 36.513098064118125, "test_MSE": 28.513675222666482}, {"shift_amount": 10.0, "train_MSE": 36.481254340722984, "test_MSE": 28.969354036587468}]}};
+      var spec = {"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}}, "layer": [{"data": {"name": "data-3a31545e72c0110b527dad0de233b5b3"}, "mark": {"type": "line", "color": "red"}, "encoding": {"x": {"field": "shift_amount", "type": "quantitative"}, "y": {"field": "train_MSE", "type": "quantitative"}}}, {"data": {"name": "data-3a31545e72c0110b527dad0de233b5b3"}, "mark": {"type": "line", "color": "blue"}, "encoding": {"x": {"field": "shift_amount", "type": "quantitative"}, "y": {"field": "test_MSE", "type": "quantitative"}}}], "$schema": "https://vega.github.io/schema/vega-lite/v6.4.1.json", "datasets": {"data-3a31545e72c0110b527dad0de233b5b3": [{"shift_amount": 1.0, "train_MSE": 36.833415921994444, "test_MSE": 28.332824059747484}, {"shift_amount": 2.0, "train_MSE": 36.53637495478581, "test_MSE": 27.52151948431774}, {"shift_amount": 3.0, "train_MSE": 36.47691354531872, "test_MSE": 27.5538299035364}, {"shift_amount": 4.0, "train_MSE": 36.45899140383669, "test_MSE": 27.60635896564852}, {"shift_amount": 5.0, "train_MSE": 36.424558449368305, "test_MSE": 27.8588682443269}, {"shift_amount": 6.0, "train_MSE": 36.41673489760835, "test_MSE": 28.015445808000877}, {"shift_amount": 7.0, "train_MSE": 36.38284505876909, "test_MSE": 28.328847560172512}, {"shift_amount": 8.0, "train_MSE": 36.374029448785706, "test_MSE": 28.431221479282524}, {"shift_amount": 9.0, "train_MSE": 36.36871410344885, "test_MSE": 28.46061275765333}, {"shift_amount": 10.0, "train_MSE": 36.337187554773, "test_MSE": 28.897912889137594}]}};
       var embedOpt = {"mode": "vega-lite"};
 
       function showError(el, error){
@@ -65,62 +65,62 @@
     <tr>
       <th>0</th>
       <td>1.0</td>
-      <td>36.976999</td>
-      <td>28.401607</td>
+      <td>36.833416</td>
+      <td>28.332824</td>
     </tr>
     <tr>
       <th>1</th>
       <td>2.0</td>
-      <td>36.677191</td>
-      <td>27.581116</td>
+      <td>36.536375</td>
+      <td>27.521519</td>
     </tr>
     <tr>
       <th>2</th>
       <td>3.0</td>
-      <td>36.619736</td>
-      <td>27.608619</td>
+      <td>36.476914</td>
+      <td>27.553830</td>
     </tr>
     <tr>
       <th>3</th>
       <td>4.0</td>
-      <td>36.602664</td>
-      <td>27.658553</td>
+      <td>36.458991</td>
+      <td>27.606359</td>
     </tr>
     <tr>
       <th>4</th>
       <td>5.0</td>
-      <td>36.569418</td>
-      <td>27.904023</td>
+      <td>36.424558</td>
+      <td>27.858868</td>
     </tr>
     <tr>
       <th>5</th>
       <td>6.0</td>
-      <td>36.561724</td>
-      <td>28.059446</td>
+      <td>36.416735</td>
+      <td>28.015446</td>
     </tr>
     <tr>
       <th>6</th>
       <td>7.0</td>
-      <td>36.527552</td>
-      <td>28.377313</td>
+      <td>36.382845</td>
+      <td>28.328848</td>
     </tr>
     <tr>
       <th>7</th>
       <td>8.0</td>
-      <td>36.518649</td>
-      <td>28.481929</td>
+      <td>36.374029</td>
+      <td>28.431221</td>
     </tr>
     <tr>
       <th>8</th>
       <td>9.0</td>
-      <td>36.513098</td>
-      <td>28.513675</td>
+      <td>36.368714</td>
+      <td>28.460613</td>
     </tr>
     <tr>
       <th>9</th>
       <td>10.0</td>
-      <td>36.481254</td>
-      <td>28.969354</td>
+      <td>36.337188</td>
+      <td>28.897913</td>
     </tr>
   </tbody>
 </table>
