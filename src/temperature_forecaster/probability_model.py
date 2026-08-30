@@ -64,9 +64,12 @@ def get_prev_temps(day: int, variable = "tmax", city = None): # override should 
 def modified_get_prev_temps(day: int, variable = "tmax", city = None): # to be used when getting the next day's max/min temp at 12am
     # so the idea is that we're going to use the approximation for the current day as a previous temp
     approximated_prev_temp = extrema_approximation_all(day-1, variable, city_name = city, one_day_ahead = False) # a singleton set btw
+    print(f"approximated temp for day {day-1}: {approximated_prev_temp}")
     raw_prev_temps = get_prev_temps(day-1, variable,city)[city]
+    print(f"prev temps as if you were on day {day-1}: {raw_prev_temps}")
     return_dict = {}
     return_dict[city] = approximated_prev_temp + raw_prev_temps[:-1] # union the two sets 
+    print(return_dict)
     return return_dict
 
 

@@ -126,7 +126,7 @@ def pipeline_live(series_ticker, market_tickers):
     #today = datetime.now(ZoneInfo("America/Los_Angeles")).date()
     #day_of_year = today.timetuple().tm_yday
 
-    day_of_year = 237#get_day(market_tickers[0])
+    day_of_year = get_day(market_tickers[0])
     #from src.forecasting import appropriate_intervals, sliced_intervals
     #print(sliced_intervals(market_tickers))
     #return
@@ -140,17 +140,17 @@ def pipeline_live(series_ticker, market_tickers):
 
     from temperature_forecaster.backtesting import backtest
 
-    backtest("2024-01-01", city = city_target, variable = target_variable)
+    #backtest("2024-01-01", city = city_target, variable = target_variable)
     # wipe_folder("charts/diagnostics") 
     # wipe_folder("charts/bias_variance")
 
     from temperature_forecaster.evaluation import calibrate
 
-    calibrate(77,79, city_name = city_target, variable_name = target_variable)
+    #calibrate(77,79, city_name = city_target, variable_name = target_variable)
     
     
     from temperature_forecaster.exploration import populate_charts
-    populate_charts(target_variable, open_charts=True, city=city_target)
+    #populate_charts(target_variable, open_charts=True, city=city_target)
 
     return return_thing
 
@@ -174,12 +174,12 @@ def collect_live_test(series_ticker="KXHIGHMIA"):
     print(result)
     return result
 
-def pipeline_live_test(series_ticker="kxhighlax", market_tickers=["KXHIGHLAX-26AUG04-T75", 
-  "KXHIGHLAX-26AUG04-B75.5",
-  "KXHIGHLAX-26AUG04-B77.5", 
-  "KXHIGHLAX-26AUG04-B79.5", 
-  "KXHIGHLAX-26AUG04-B81.5",
-  "KXHIGHLAX-26AUG04-T82"]):
+def pipeline_live_test(series_ticker="kxhighlax", market_tickers=["KXHIGHLAX-26AUG31-T72", 
+  "KXHIGHLAX-26AUG31-B72.5",
+  "KXHIGHLAX-26AUG31-B74.5", 
+  "KXHIGHLAX-26AUG31-B76.5", 
+  "KXHIGHLAX-26AUG31-B78.5",
+  "KXHIGHLAX-26AUG31-T79"]):
     print(f"\n===== PIPELINE_LIVE TEST =====")
     result = pipeline_live(series_ticker, market_tickers)
     assert isinstance(result, dict)
